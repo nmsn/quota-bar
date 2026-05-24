@@ -58,7 +58,12 @@ final class PlatformConfigStore {
     // MARK: - Private
 
     private func load() {
-        guard let dict = UserDefaults.standard.dictionary(forKey: defaultsKey) else { return }
+        guard let anyValue = UserDefaults.standard.object(forKey: defaultsKey) else { return }
+        guard let dict = anyValue as? [String: Any] else {
+            // Data corruption: stored value is not a dictionary, reset it
+            UserDefaults.standard.removeObject(forKey: defaultsKey)
+            return
+        }
         apiBaseURL = dict["api_base_url"] as? String ?? ""
         authHeader = dict["auth_header"] as? String ?? "Authorization"
         authPrefix = dict["auth_prefix"] as? String ?? "Bearer "
