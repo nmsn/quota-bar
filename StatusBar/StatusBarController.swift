@@ -3,7 +3,7 @@ import SwiftUI
 
 @MainActor
 class StatusBarController {
-    private static let minimumItemWidth: CGFloat = 40
+    private static let minimumItemWidth: CGFloat = 36
 
     private var statusItem: NSStatusItem
     private var statusBarView: RightClickStatusBarView

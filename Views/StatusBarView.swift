@@ -125,7 +125,7 @@ struct StatusBarView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: secondaryPercent != nil ? .topLeading : .center)
         }
         .padding(.horizontal, 2)
-        .frame(width: 44, height: 22, alignment: .leading)
+        .frame(minWidth: 36, idealWidth: 60, maxWidth: .infinity, minHeight: 22, idealHeight: 22, maxHeight: 22, alignment: .leading)
     }
 
     private func formatBalance(_ value: Double, unit: String?) -> String {
