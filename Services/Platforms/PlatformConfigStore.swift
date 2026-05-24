@@ -4,6 +4,7 @@ final class PlatformConfigStore {
     let platformType: PlatformType
 
     private(set) var apiBaseURL: String
+    private(set) var apiBaseURLInternational: String?
     private(set) var authHeader: String
     private(set) var authPrefix: String
     private(set) var apiKey: String?
@@ -21,6 +22,7 @@ final class PlatformConfigStore {
         self.defaultsKey = "quotabar.platform.\(platformType.rawValue)"
 
         self.apiBaseURL = ""
+        self.apiBaseURLInternational = nil
         self.authHeader = "Authorization"
         self.authPrefix = "Bearer "
         self.region = "domestic"
@@ -36,7 +38,8 @@ final class PlatformConfigStore {
             authHeader: authHeader,
             authPrefix: authPrefix,
             apiKey: apiKey ?? "",
-            region: region
+            region: region,
+            apiBaseURLInternational: apiBaseURLInternational
         )
     }
 
@@ -65,6 +68,7 @@ final class PlatformConfigStore {
             return
         }
         apiBaseURL = dict["api_base_url"] as? String ?? ""
+        apiBaseURLInternational = dict["api_base_url_international"] as? String
         authHeader = dict["auth_header"] as? String ?? "Authorization"
         authPrefix = dict["auth_prefix"] as? String ?? "Bearer "
         apiKey = dict["api_key"] as? String
@@ -74,6 +78,7 @@ final class PlatformConfigStore {
     private func save() {
         var dict: [String: Any] = [
             "api_base_url": apiBaseURL,
+            "api_base_url_international": apiBaseURLInternational as Any,
             "auth_header": authHeader,
             "auth_prefix": authPrefix,
             "region": region
@@ -85,13 +90,26 @@ final class PlatformConfigStore {
     private func fillDefaultsFromTemplateIfNeeded() {
         guard apiBaseURL.isEmpty else { return }
 
-        let templateName = "\(platformType.rawValue).template"
+        // Template name based on base platform (minimax, glm, etc.)
+        let templatePlatformName: String
+        switch platformType {
+        case .minimax_cn, .minimax_en:
+            templatePlatformName = "minimax"
+        case .glm_cn, .glm_en:
+            templatePlatformName = "glm"
+        default:
+            templatePlatformName = platformType.rawValue
+        }
+        let templateName = "\(templatePlatformName).template"
         guard let templateURL = Bundle.main.url(forResource: templateName, withExtension: "json"),
               let data = try? Data(contentsOf: templateURL),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
 
         if let baseURL = json["api_base_url"] as? String, !baseURL.isEmpty {
             apiBaseURL = baseURL
+        }
+        if let intlURL = json["api_base_url_international"] as? String {
+            apiBaseURLInternational = intlURL
         }
         if let header = json["auth_header"] as? String {
             authHeader = header
@@ -110,7 +128,7 @@ extension PlatformType {
     var isEnabled: Bool {
         get {
             if UserDefaults.standard.object(forKey: "quotabar.platform.\(rawValue).enabled") == nil {
-                return self == .minimax  // Only MiniMax enabled by default
+                return self == .minimax_cn  // Only MiniMax CN enabled by default
             }
             return UserDefaults.standard.bool(forKey: "quotabar.platform.\(rawValue).enabled")
         }

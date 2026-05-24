@@ -21,7 +21,7 @@ struct GLMUsageData: Codable {
 }
 
 final class GLMPlatformAPIService: PlatformAPIService {
-    let platformType: PlatformType = .glm
+    let platformType: PlatformType = .glm_cn
 
     private let cacheTimeout: TimeInterval = 10
     private var cache: (data: PlatformUsageData, timestamp: Date)?
@@ -40,12 +40,12 @@ final class GLMPlatformAPIService: PlatformAPIService {
         }
 
         guard !config.apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw PlatformError.notConfigured(.glm)
+            throw PlatformError.notConfigured(config.platformType)
         }
 
         let baseURL = apiBaseURL(for: config)
         guard let url = URL(string: baseURL) else {
-            throw PlatformError.invalidResponse(.glm)
+            throw PlatformError.invalidResponse(config.platformType)
         }
 
         var request = URLRequest(url: url)
@@ -58,26 +58,26 @@ final class GLMPlatformAPIService: PlatformAPIService {
         do {
             (data, response) = try await network.data(from: request)
         } catch {
-            throw PlatformError.networkError(.glm, error.localizedDescription)
+            throw PlatformError.networkError(config.platformType, error.localizedDescription)
         }
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw PlatformError.invalidResponse(.glm)
+            throw PlatformError.invalidResponse(config.platformType)
         }
 
         if httpResponse.statusCode == 401 {
-            throw PlatformError.unauthorized(.glm)
+            throw PlatformError.unauthorized(config.platformType)
         }
 
         guard httpResponse.statusCode == 200 else {
-            throw PlatformError.networkError(.glm, "HTTP \(httpResponse.statusCode)")
+            throw PlatformError.networkError(config.platformType, "HTTP \(httpResponse.statusCode)")
         }
 
         let usageResponse: GLMUsageResponse
         do {
             usageResponse = try JSONDecoder().decode(GLMUsageResponse.self, from: data)
         } catch {
-            throw PlatformError.decodingError(.glm, error.localizedDescription)
+            throw PlatformError.decodingError(config.platformType, error.localizedDescription)
         }
 
         var metrics: [UsageMetric] = []
@@ -107,8 +107,8 @@ final class GLMPlatformAPIService: PlatformAPIService {
         let isHealthy = usageResponse.success && !metrics.isEmpty
 
         let usageData = PlatformUsageData(
-            platform: .glm,
-            displayName: "GLM",
+            platform: config.platformType,
+            displayName: config.platformType.displayName,
             metrics: metrics,
             lastUpdated: Date(),
             isHealthy: isHealthy

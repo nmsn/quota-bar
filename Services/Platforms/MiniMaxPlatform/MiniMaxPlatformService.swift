@@ -1,7 +1,7 @@
 import Foundation
 
 final class MiniMaxPlatformAPIService: PlatformAPIService {
-    let platformType: PlatformType = .minimax
+    let platformType: PlatformType = .minimax_cn
 
     private let cacheTimeout: TimeInterval = 10
     private var cache: (data: PlatformUsageData, timestamp: Date)?
@@ -12,16 +12,16 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
         }
 
         guard !config.apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw PlatformError.notConfigured(.minimax)
+            throw PlatformError.notConfigured(config.platformType)
         }
 
         let baseURL = apiBaseURL(for: config)
         guard !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw PlatformError.notConfigured(.minimax)
+            throw PlatformError.notConfigured(config.platformType)
         }
 
         guard let url = URL(string: baseURL) else {
-            throw PlatformError.invalidResponse(.minimax)
+            throw PlatformError.invalidResponse(config.platformType)
         }
 
         var request = URLRequest(url: url)
@@ -34,34 +34,34 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
         do {
             (data, response) = try await network.data(from: request)
         } catch {
-            throw PlatformError.networkError(.minimax, error.localizedDescription)
+            throw PlatformError.networkError(config.platformType, error.localizedDescription)
         }
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw PlatformError.invalidResponse(.minimax)
+            throw PlatformError.invalidResponse(config.platformType)
         }
 
         if httpResponse.statusCode == 401 {
-            throw PlatformError.unauthorized(.minimax)
+            throw PlatformError.unauthorized(config.platformType)
         }
 
         guard httpResponse.statusCode == 200 else {
             let responseString = String(data: data, encoding: .utf8) ?? "unable to decode"
-            throw PlatformError.networkError(.minimax, "HTTP \(httpResponse.statusCode): \(responseString.prefix(200))")
+            throw PlatformError.networkError(config.platformType, "HTTP \(httpResponse.statusCode): \(responseString.prefix(200))")
         }
 
         let apiResponse: APIResponse
         do {
             apiResponse = try JSONDecoder().decode(APIResponse.self, from: data)
         } catch {
-            throw PlatformError.decodingError(.minimax, error.localizedDescription)
+            throw PlatformError.decodingError(config.platformType, error.localizedDescription)
         }
 
         guard let modelData = apiResponse.modelRemains?.first else {
-            throw PlatformError.invalidResponse(.minimax)
+            throw PlatformError.invalidResponse(config.platformType)
         }
 
-        let usageData = parseUsageData(from: modelData)
+        let usageData = parseUsageData(from: modelData, platform: config.platformType)
         cache = (usageData, Date())
         return usageData
     }
@@ -78,7 +78,7 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
         return config.apiBaseURL
     }
 
-    private func parseUsageData(from model: ModelRemain) -> PlatformUsageData {
+    private func parseUsageData(from model: ModelRemain, platform: PlatformType) -> PlatformUsageData {
         let dailyTotal = Double(model.currentIntervalTotalCount ?? 0)
         let dailyUsed = Double(model.currentIntervalUsageCount ?? 0)
         let weeklyTotal = Double(model.currentWeeklyTotalCount ?? 0)
@@ -95,8 +95,8 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
         let isHealthy = dailyPercentage < 0.85
 
         return PlatformUsageData(
-            platform: .minimax,
-            displayName: "MiniMax",
+            platform: platform,
+            displayName: platform.displayName,
             metrics: [
                 UsageMetric(label: "five_hour", currentValue: dailyUsed, totalValue: dailyTotal, unit: "requests", resetTime: dailyResetTime),
                 UsageMetric(label: "weekly_limit", currentValue: weeklyUsed, totalValue: weeklyTotal, unit: "requests", resetTime: weeklyResetTime)
