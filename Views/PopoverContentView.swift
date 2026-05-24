@@ -184,19 +184,8 @@ struct PopoverContentView: View {
                 .font(.subheadline.bold())
 
             HStack(spacing: 8) {
-                Group {
-                    if viewModel.showingAPIKey {
-                        TextField(I18nService.shared.translate("popover.inputPlaceholder"), text: $viewModel.apiKeyInput)
-                            .textFieldStyle(.plain)
-                    } else {
-                        SecureField(I18nService.shared.translate("popover.inputPlaceholder"), text: $viewModel.apiKeyInput)
-                            .textFieldStyle(.plain)
-                    }
-                }
-                .font(.system(.body, design: .monospaced))
-                .padding(8)
-                .background(Color(white: 0.95))
-                .cornerRadius(6)
+                PasteableTextField(text: $viewModel.apiKeyInput, placeholder: I18nService.shared.translate("popover.inputPlaceholder"), isSecure: !viewModel.showingAPIKey)
+                    .frame(height: 60)
 
                 Button(action: { viewModel.showingAPIKey.toggle() }) {
                     Image(systemName: viewModel.showingAPIKey ? "eye.slash" : "eye")
@@ -204,7 +193,6 @@ struct PopoverContentView: View {
                 }
                 .buttonStyle(.plain)
             }
-            .frame(height: 60)
 
             if viewModel.configPlatform == .glm {
                 regionPicker

@@ -4,6 +4,7 @@ import AppKit
 struct PasteableTextField: NSViewRepresentable {
     @Binding var text: String
     var placeholder: String = ""
+    var isSecure: Bool = false
 
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSScrollView()
@@ -24,6 +25,7 @@ struct PasteableTextField: NSViewRepresentable {
         textView.textContainer?.heightTracksTextView = false
         textView.delegate = context.coordinator
         textView.string = text
+        textView.isSecure = isSecure
 
         scrollView.documentView = textView
 
@@ -31,8 +33,14 @@ struct PasteableTextField: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSScrollView, context: Context) {
-        if let textView = nsView.documentView as? NSTextView, textView.string != text {
-            textView.string = text
+        if let textView = nsView.documentView as? KeyHandlingTextView {
+            if textView.string != text {
+                textView.string = text
+            }
+            if textView.isSecure != isSecure {
+                textView.isSecure = isSecure
+                textView.needsDisplay = true
+            }
         }
     }
 
@@ -56,6 +64,12 @@ struct PasteableTextField: NSViewRepresentable {
 }
 
 class KeyHandlingTextView: NSTextView {
+    var isSecure: Bool = false {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
         if event.type == .keyDown && event.modifierFlags.contains(.command) {
             if event.charactersIgnoringModifiers == "v" {
@@ -66,5 +80,18 @@ class KeyHandlingTextView: NSTextView {
             }
         }
         return super.performKeyEquivalent(with: event)
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        if isSecure && !string.isEmpty {
+            let asterisks = String(repeating: "*", count: min(string.count, 40))
+            let attrs: [NSAttributedString.Key: Any] = [
+                .font: font ?? NSFont.systemFont(ofSize: 13),
+                .foregroundColor: NSColor.textColor
+            ]
+            asterisks.draw(at: NSPoint(x: 4, y: 4), withAttributes: attrs)
+        } else {
+            super.draw(dirtyRect)
+        }
     }
 }
