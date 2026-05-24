@@ -1,5 +1,9 @@
 import Foundation
 
+extension Notification.Name {
+    static let platformEnabledChanged = Notification.Name("platformEnabledChanged")
+}
+
 final class PlatformManager {
     static let shared = PlatformManager()
 
@@ -73,5 +77,10 @@ final class PlatformManager {
 
     func clearAllCaches() {
         services.values.forEach { $0.clearCache() }
+    }
+
+    func setPlatformEnabled(_ enabled: Bool, for platform: PlatformType) {
+        UserDefaults.standard.set(enabled, forKey: "quotabar.platform.\(platform.rawValue).enabled")
+        NotificationCenter.default.post(name: .platformEnabledChanged, object: nil)
     }
 }
