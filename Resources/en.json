@@ -52,5 +52,9 @@
     "config.regionDomestic": "Domestic",
     "config.regionInternational": "International",
     "platform.glm": "GLM",
-    "platform.kimi": "Kimi"
+    "platform.glm_cn": "GLM (CN)",
+    "platform.glm_en": "GLM (EN)",
+    "platform.kimi": "Kimi",
+    "platform.minimax_cn": "MiniMax (CN)",
+    "platform.minimax_en": "MiniMax (EN)"
 }

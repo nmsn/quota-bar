@@ -86,6 +86,12 @@ final class PlatformManager {
         if !enabled && platform.isEnabled && isLastEnabledPlatform(platform) {
             return
         }
+
+        // Auto-disable sibling platform (CN/EN mutex)
+        if enabled, let sibling = platform.siblingPlatform, sibling.isEnabled {
+            UserDefaults.standard.set(false, forKey: "quotabar.platform.\(sibling.rawValue).enabled")
+        }
+
         UserDefaults.standard.set(enabled, forKey: "quotabar.platform.\(platform.rawValue).enabled")
         NotificationCenter.default.post(name: .platformEnabledChanged, object: nil)
     }

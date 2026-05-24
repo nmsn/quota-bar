@@ -1,17 +1,31 @@
 import Foundation
 
 enum PlatformType: String, Codable, CaseIterable, Hashable {
-    case minimax
+    case minimax_cn
+    case minimax_en
     case deepseek
-    case glm
+    case glm_cn
+    case glm_en
     case kimi
 
     var displayName: String {
         switch self {
-        case .minimax: return "MiniMax"
+        case .minimax_cn: return "MiniMax (CN)"
+        case .minimax_en: return "MiniMax (EN)"
         case .deepseek: return "DeepSeek"
-        case .glm: return "GLM"
+        case .glm_cn: return "GLM (CN)"
+        case .glm_en: return "GLM (EN)"
         case .kimi: return "Kimi"
+        }
+    }
+
+    var siblingPlatform: PlatformType? {
+        switch self {
+        case .minimax_cn: return .minimax_en
+        case .minimax_en: return .minimax_cn
+        case .glm_cn: return .glm_en
+        case .glm_en: return .glm_cn
+        default: return nil
         }
     }
 }

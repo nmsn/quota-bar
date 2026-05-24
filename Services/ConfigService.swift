@@ -9,7 +9,7 @@ final class ConfigService {
     static let shared = ConfigService()
 
     private var cachedDisplayMode: DisplayMode = .used
-    private var cachedActivePlatform: PlatformType = .minimax
+    private var cachedActivePlatform: PlatformType = .minimax_cn
     private var cachedRefreshInterval: RefreshInterval = .default
     private var platformStores: [PlatformType: PlatformConfigStore] = [:]
 
