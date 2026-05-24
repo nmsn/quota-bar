@@ -18,6 +18,7 @@ final class PlatformViewModel: ObservableObject {
     @Published var configPlatform: PlatformType?
     @Published var apiKeyInput: String = ""
     @Published var regionInput: String = "domestic"
+    @Published var showingAPIKey: Bool = false
 
     weak var delegate: PlatformViewModelDelegate?
 
@@ -133,8 +134,10 @@ final class PlatformViewModel: ObservableObject {
 
     func configureAPIKey(for platform: PlatformType) {
         configPlatform = platform
-        apiKeyInput = ""
-        regionInput = configService.store(for: platform).region
+        let store = configService.store(for: platform)
+        apiKeyInput = store.isConfigured ? (store.apiKey ?? "") : ""
+        regionInput = store.region
+        showingAPIKey = false
         showingConfig = true
     }
 
@@ -160,6 +163,7 @@ final class PlatformViewModel: ObservableObject {
         configPlatform = nil
         apiKeyInput = ""
         regionInput = "domestic"
+        showingAPIKey = false
     }
 
     // MARK: - Computed
