@@ -43,6 +43,13 @@ final class PlatformViewModel: ObservableObject {
     // MARK: - Platform Enabled Observer
 
     @objc private func onPlatformEnabledChanged() {
+        // When platform enabled state changes, ensure active platform is still valid
+        if !activePlatform.isEnabled {
+            // Current active platform was disabled, switch to first enabled platform
+            if let firstEnabled = configService.allEnabledPlatforms.first {
+                switchActivePlatform(firstEnabled)
+            }
+        }
         objectWillChange.send()
     }
 
