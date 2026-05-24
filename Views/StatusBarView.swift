@@ -32,8 +32,8 @@ struct StatusBarView: View {
                 }
                 return "\(Int(percentage * 100))%"
             } else {
-                // Balance display
-                return formatBalance(metric.currentValue, unit: metric.unit)
+                // Balance display (no total value = likely currency balance)
+                return formatBalance(metric.currentValue, unit: nil)
             }
         }
 
@@ -62,7 +62,7 @@ struct StatusBarView: View {
                 }
                 return "\(Int(percentage * 100))%"
             } else {
-                return formatBalance(metric.currentValue, unit: metric.unit)
+                return formatBalance(metric.currentValue, unit: nil)
             }
         }
 
@@ -128,7 +128,7 @@ struct StatusBarView: View {
         .frame(width: 40, height: 22, alignment: .leading)
     }
 
-    private func formatBalance(_ value: Double, unit: String) -> String {
+    private func formatBalance(_ value: Double, unit: String?) -> String {
         if value >= 1000 {
             return String(format: "%.1fK", value / 1000)
         } else if value >= 100 {
