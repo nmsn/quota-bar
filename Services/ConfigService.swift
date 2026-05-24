@@ -58,6 +58,10 @@ final class ConfigService {
         PlatformType.allCases.filter { store(for: $0).isConfigured }
     }
 
+    var allEnabledPlatforms: [PlatformType] {
+        PlatformType.allCases.filter { $0.isEnabled }
+    }
+
     // MARK: - Private
 
     private func loadGlobalConfig() {
