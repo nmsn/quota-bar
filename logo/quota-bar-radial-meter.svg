@@ -1,0 +1,25 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <g fill="currentColor">
+    <!-- Ring 1: top -->
+    <circle cx="50" cy="12" r="5"/>
+    <!-- Ring 2: top-right -->
+    <circle cx="82" cy="32" r="4.5"/>
+    <!-- Ring 3: bottom-right -->
+    <circle cx="70" cy="62" r="4"/>
+    <!-- Ring 4: bottom -->
+    <circle cx="50" cy="88" r="3.5"/>
+    <!-- Ring 5: bottom-left -->
+    <circle cx="30" cy="62" r="4"/>
+    <!-- Ring 6: top-left -->
+    <circle cx="18" cy="32" r="4.5"/>
+    <!-- Center: unified data core -->
+    <circle cx="50" cy="50" r="8" fill="currentColor"/>
+    <!-- Radial lines connecting center to each bar -->
+    <line x1="50" y1="50" x2="50" y2="12" stroke="currentColor" stroke-width="1.2" opacity="0.35"/>
+    <line x1="50" y1="50" x2="82" y2="32" stroke="currentColor" stroke-width="1.2" opacity="0.35"/>
+    <line x1="50" y1="50" x2="70" y2="62" stroke="currentColor" stroke-width="1.2" opacity="0.35"/>
+    <line x1="50" y1="50" x2="50" y2="88" stroke="currentColor" stroke-width="1.2" opacity="0.35"/>
+    <line x1="50" y1="50" x2="30" y2="62" stroke="currentColor" stroke-width="1.2" opacity="0.35"/>
+    <line x1="50" y1="50" x2="18" y2="32" stroke="currentColor" stroke-width="1.2" opacity="0.35"/>
+  </g>
+</svg>
