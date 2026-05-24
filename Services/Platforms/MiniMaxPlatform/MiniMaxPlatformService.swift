@@ -15,11 +15,12 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
             throw PlatformError.notConfigured(.minimax)
         }
 
-        guard !config.apiBaseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        let baseURL = apiBaseURL(for: config)
+        guard !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw PlatformError.notConfigured(.minimax)
         }
 
-        guard let url = URL(string: config.apiBaseURL) else {
+        guard let url = URL(string: baseURL) else {
             throw PlatformError.invalidResponse(.minimax)
         }
 
@@ -69,6 +70,14 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
         cache = nil
     }
 
+    private func apiBaseURL(for config: PlatformConfigData) -> String {
+        let region = config.region ?? "domestic"
+        if region == "international" {
+            return config.apiBaseURLInternational ?? config.apiBaseURL
+        }
+        return config.apiBaseURL
+    }
+
     private func parseUsageData(from model: ModelRemain) -> PlatformUsageData {
         let dailyTotal = Double(model.currentIntervalTotalCount ?? 0)
         let dailyUsed = Double(model.currentIntervalUsageCount ?? 0)
@@ -89,8 +98,8 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
             platform: .minimax,
             displayName: "MiniMax",
             metrics: [
-                UsageMetric(label: "Daily", currentValue: dailyUsed, totalValue: dailyTotal, unit: "requests", resetTime: dailyResetTime),
-                UsageMetric(label: "Weekly", currentValue: weeklyUsed, totalValue: weeklyTotal, unit: "requests", resetTime: weeklyResetTime)
+                UsageMetric(label: "five_hour", currentValue: dailyUsed, totalValue: dailyTotal, unit: "requests", resetTime: dailyResetTime),
+                UsageMetric(label: "weekly_limit", currentValue: weeklyUsed, totalValue: weeklyTotal, unit: "requests", resetTime: weeklyResetTime)
             ],
             lastUpdated: Date(),
             isHealthy: isHealthy
