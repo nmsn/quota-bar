@@ -19,6 +19,7 @@ final class PlatformManager {
         register(MiniMaxPlatformAPIService())
         register(DeepSeekPlatformAPIService())
         register(GLMPlatformAPIService())
+        register(KimiPlatformAPIService())
     }
 
     func register(_ service: PlatformAPIService) {
