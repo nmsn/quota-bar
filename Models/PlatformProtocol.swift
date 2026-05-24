@@ -4,12 +4,14 @@ enum PlatformType: String, Codable, CaseIterable, Hashable {
     case minimax
     case deepseek
     case glm
+    case kimi
 
     var displayName: String {
         switch self {
         case .minimax: return "MiniMax"
         case .deepseek: return "DeepSeek"
         case .glm: return "GLM"
+        case .kimi: return "Kimi"
         }
     }
 }
