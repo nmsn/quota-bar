@@ -194,10 +194,6 @@ struct PopoverContentView: View {
                 .buttonStyle(.plain)
             }
 
-            if viewModel.configPlatform == .glm {
-                regionPicker
-            }
-
             HStack {
                 Button(action: { viewModel.cancelConfig() }) {
                     Image(systemName: "xmark")
