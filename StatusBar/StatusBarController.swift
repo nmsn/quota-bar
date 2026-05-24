@@ -136,27 +136,24 @@ class StatusBarController {
         let refreshItem = NSMenuItem(title: I18nService.shared.translate("menu.refreshInterval"), action: nil, keyEquivalent: "")
         refreshItem.submenu = refreshMenu
 
-        // Platform submenu
+        // Platform Enable/Disable submenu
         let platformMenu = NSMenu()
+
+        // Add checkbox items for each platform
         for platform in PlatformType.allCases {
-            let item = NSMenuItem(title: platform.displayName, action: #selector(switchPlatform(_:)), keyEquivalent: "")
+            let item = NSMenuItem(title: platform.displayName, action: #selector(togglePlatformEnabled(_:)), keyEquivalent: "")
             item.target = self
-            item.representedObject = platform.rawValue
-            item.state = platform == viewModel.activePlatform ? .on : .off
-
-            if !viewModel.isConfigured(platform) {
-                item.isEnabled = false
-                item.title = platform.displayName + " (" + I18nService.shared.translate("menu.notConfigured") + ")"
-            }
-
+            item.representedObject = platform
+            item.state = platform.isEnabled ? .on : .off
             platformMenu.addItem(item)
         }
+
         platformMenu.addItem(NSMenuItem.separator())
         let configureItem = NSMenuItem(title: I18nService.shared.translate("menu.configurePlatform"), action: #selector(showConfigMenu), keyEquivalent: "")
         configureItem.target = self
         platformMenu.addItem(configureItem)
 
-        let platformItem = NSMenuItem(title: I18nService.shared.translate("menu.platform"), action: nil, keyEquivalent: "")
+        let platformItem = NSMenuItem(title: I18nService.shared.translate("menu.platforms"), action: nil, keyEquivalent: "")
         platformItem.submenu = platformMenu
 
         // Language submenu
@@ -206,6 +203,13 @@ class StatusBarController {
               let platform = PlatformType(rawValue: rawValue) else { return }
         viewModel.switchActivePlatform(platform)
         updateStatusBarView()
+    }
+
+    @objc private func togglePlatformEnabled(_ sender: NSMenuItem) {
+        guard let platform = sender.representedObject as? PlatformType else { return }
+        let newState = !platform.isEnabled
+        PlatformManager.shared.setPlatformEnabled(newState, for: platform)
+        sender.state = newState ? .on : .off
     }
 
     @objc private func showConfigMenu() {

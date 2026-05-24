@@ -15,6 +15,7 @@
     "menu.lang.en": "English",
     "menu.lang.zh": "简体中文",
     "menu.platform": "平台",
+    "menu.platforms": "平台",
     "menu.configurePlatform": "配置...",
     "menu.notConfigured": "未配置",
     "popover.configureToken": "配置 API Token",
