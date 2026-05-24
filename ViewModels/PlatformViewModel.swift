@@ -29,6 +29,19 @@ final class PlatformViewModel: ObservableObject {
         self.platformManager = platformManager
         self.configService = configService
         self.activePlatform = configService.activePlatform
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(onPlatformEnabledChanged),
+            name: .platformEnabledChanged,
+            object: nil
+        )
+    }
+
+    // MARK: - Platform Enabled Observer
+
+    @objc private func onPlatformEnabledChanged() {
+        objectWillChange.send()
     }
 
     // MARK: - Auto Refresh
