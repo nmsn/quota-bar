@@ -86,7 +86,7 @@ final class GLMPlatformAPIService: PlatformAPIService {
             for limit in limits {
                 if limit.type == "TIME_LIMIT", let remaining = limit.remaining, let usage = limit.usage {
                     metrics.append(UsageMetric(
-                        label: "Time Limit",
+                        label: "five_hour",
                         currentValue: Double(remaining),
                         totalValue: Double(usage),
                         unit: "times",
@@ -94,7 +94,7 @@ final class GLMPlatformAPIService: PlatformAPIService {
                     ))
                 } else if limit.type == "TOKENS_LIMIT", let percentage = limit.percentage {
                     metrics.append(UsageMetric(
-                        label: "Tokens Limit",
+                        label: "weekly_limit",
                         currentValue: Double(100 - percentage),
                         totalValue: 100,
                         unit: "%",
