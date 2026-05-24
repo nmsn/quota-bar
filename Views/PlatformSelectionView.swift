@@ -18,14 +18,22 @@ struct PlatformSelectionView: View {
                         viewModel.fetchAllUsage()
                     }
                 )) {
-                    Text(platform.displayName)
-                        .font(.body)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(platform.displayName)
+                            .font(.body)
+                        if PlatformManager.shared.isLastEnabledPlatform(platform) && platform.isEnabled {
+                            Text("At least one platform required")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 }
+                .disabled(PlatformManager.shared.isLastEnabledPlatform(platform) && platform.isEnabled)
             }
 
             Spacer()
         }
         .padding()
-        .frame(width: 250, height: 180)
+        .frame(width: 250, height: 200)
     }
 }

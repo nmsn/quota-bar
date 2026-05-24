@@ -81,7 +81,15 @@ final class PlatformManager {
     }
 
     func setPlatformEnabled(_ enabled: Bool, for platform: PlatformType) {
+        // Prevent disabling the last enabled platform
+        if !enabled && platform.isEnabled && isLastEnabledPlatform(platform) {
+            return
+        }
         UserDefaults.standard.set(enabled, forKey: "quotabar.platform.\(platform.rawValue).enabled")
         NotificationCenter.default.post(name: .platformEnabledChanged, object: nil)
+    }
+
+    func isLastEnabledPlatform(_ platform: PlatformType) -> Bool {
+        PlatformType.allCases.filter { $0.isEnabled }.count <= 1 && platform.isEnabled
     }
 }
