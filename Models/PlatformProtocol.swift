@@ -61,6 +61,8 @@ struct PlatformConfigData {
     let authHeader: String
     let authPrefix: String
     let apiKey: String
+    var region: String?  // "domestic" or "international"
+    var apiBaseURLInternational: String?
 }
 
 protocol NetworkService {
