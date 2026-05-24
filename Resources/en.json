@@ -51,5 +51,6 @@
     "config.region": "Region",
     "config.regionDomestic": "Domestic",
     "config.regionInternational": "International",
-    "platform.glm": "GLM"
+    "platform.glm": "GLM",
+    "platform.kimi": "Kimi"
 }
