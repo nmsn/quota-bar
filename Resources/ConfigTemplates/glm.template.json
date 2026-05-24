@@ -1,0 +1,8 @@
+{
+  "api_base_url": "https://open.bigmodel.cn/api/monitor/usage/quota/limit",
+  "api_base_url_international": "https://api.z.ai/api/monitor/usage/quota/limit",
+  "auth_header": "Authorization",
+  "auth_prefix": "",
+  "api_key": "",
+  "region": "domestic"
+}
