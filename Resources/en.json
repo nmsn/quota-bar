@@ -47,5 +47,6 @@
     "error.invalidResponse": "Invalid response data.",
     "error.networkError": "Network error: %@",
     "error.unauthorized": "Authentication failed. Please check your Token.",
-    "error.tokenRequired": "Token not configured."
+    "error.tokenRequired": "Token not configured.",
+    "platform.glm": "GLM"
 }
