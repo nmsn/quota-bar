@@ -1,6 +1,8 @@
 {
-  "api_base_url": "https://www.minimaxi.com/v1/api/openplatform/coding_plan/remains",
+  "api_base_url": "https://api.minimaxi.com/v1/api/openplatform/coding_plan/remains",
+  "api_base_url_international": "https://api.minimax.io/v1/api/openplatform/coding_plan/remains",
   "auth_header": "Authorization",
   "auth_prefix": "Bearer ",
-  "api_key": ""
+  "api_key": "",
+  "region": "domestic"
 }
