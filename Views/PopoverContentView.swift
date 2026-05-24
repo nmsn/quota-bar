@@ -38,7 +38,7 @@ struct PopoverContentView: View {
             }
 
             Button(action: { showPlatformSelection = true }) {
-                Image(systemName: "checkmark.circle")
+                Image(systemName: "checklist")
                     .foregroundColor(.secondary)
             }
             .popover(isPresented: $showPlatformSelection) {
