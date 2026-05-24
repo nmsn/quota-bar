@@ -18,6 +18,7 @@ final class PlatformManager {
         // Register default platform services
         register(MiniMaxPlatformAPIService())
         register(DeepSeekPlatformAPIService())
+        register(GLMPlatformAPIService())
     }
 
     func register(_ service: PlatformAPIService) {
