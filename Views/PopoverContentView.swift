@@ -298,12 +298,14 @@ struct PopoverContentView: View {
                 }
                 .buttonStyle(.bordered)
             } else {
-                Button(action: {
-                    viewModel.fetchAllUsage()
-                }) {
-                    Image(systemName: "arrow.clockwise")
+                if viewModel.isConfigured(viewModel.activePlatform) {
+                    Button(action: {
+                        viewModel.fetchAllUsage()
+                    }) {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    .buttonStyle(.bordered)
                 }
-                .buttonStyle(.bordered)
 
                 Button(action: { viewModel.configureAPIKey(for: viewModel.activePlatform) }) {
                     Image(systemName: "gear")
