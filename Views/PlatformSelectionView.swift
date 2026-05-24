@@ -18,14 +18,16 @@ struct PlatformSelectionView: View {
                         viewModel.fetchAllUsage()
                     }
                 )) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(platform.displayName)
-                            .font(.body)
-                        if PlatformManager.shared.isLastEnabledPlatform(platform) && platform.isEnabled {
+                    HStack(alignment: .top, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(platform.displayName)
+                                .font(.body)
                             Text("At least one platform required")
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
+                                .opacity(PlatformManager.shared.isLastEnabledPlatform(platform) && platform.isEnabled ? 1 : 0)
                         }
+                        Spacer()
                     }
                 }
                 .disabled(PlatformManager.shared.isLastEnabledPlatform(platform) && platform.isEnabled)
