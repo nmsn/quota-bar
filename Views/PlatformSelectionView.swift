@@ -15,6 +15,9 @@ struct PlatformSelectionView: View {
                     get: { platform.isEnabled },
                     set: { newValue in
                         PlatformManager.shared.setPlatformEnabled(newValue, for: platform)
+                        if newValue {
+                            viewModel.switchActivePlatform(platform)
+                        }
                         viewModel.fetchAllUsage()
                     }
                 )) {

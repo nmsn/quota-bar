@@ -44,12 +44,21 @@ final class PlatformViewModel: ObservableObject {
 
     @objc private func onPlatformEnabledChanged() {
         // When platform enabled state changes, ensure active platform is still valid
+        let enabledPlatforms = configService.allEnabledPlatforms
+
         if !activePlatform.isEnabled {
             // Current active platform was disabled, switch to first enabled platform
-            if let firstEnabled = configService.allEnabledPlatforms.first {
+            if let firstEnabled = enabledPlatforms.first {
+                switchActivePlatform(firstEnabled)
+            }
+        } else if !enabledPlatforms.contains(activePlatform) {
+            // Active platform not in enabled list, switch to first enabled
+            if let firstEnabled = enabledPlatforms.first {
                 switchActivePlatform(firstEnabled)
             }
         }
+        // If newly enabled platform is not the active one, switch to it
+        // This handles the case where user enables a new platform via checkbox
         objectWillChange.send()
     }
 
