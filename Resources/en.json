@@ -48,5 +48,8 @@
     "error.networkError": "Network error: %@",
     "error.unauthorized": "Authentication failed. Please check your Token.",
     "error.tokenRequired": "Token not configured.",
+    "config.region": "Region",
+    "config.regionDomestic": "Domestic",
+    "config.regionInternational": "International",
     "platform.glm": "GLM"
 }

@@ -7,6 +7,7 @@ final class PlatformConfigStore {
     private(set) var authHeader: String
     private(set) var authPrefix: String
     private(set) var apiKey: String?
+    private(set) var region: String  // "domestic" or "international"
 
     private let defaultsKey: String
 
@@ -22,6 +23,7 @@ final class PlatformConfigStore {
         self.apiBaseURL = ""
         self.authHeader = "Authorization"
         self.authPrefix = "Bearer "
+        self.region = "domestic"
 
         load()
         fillDefaultsFromTemplateIfNeeded()
@@ -33,7 +35,8 @@ final class PlatformConfigStore {
             apiBaseURL: apiBaseURL,
             authHeader: authHeader,
             authPrefix: authPrefix,
-            apiKey: apiKey ?? ""
+            apiKey: apiKey ?? "",
+            region: region
         )
     }
 
@@ -47,6 +50,11 @@ final class PlatformConfigStore {
         save()
     }
 
+    func setRegion(_ newRegion: String) {
+        region = newRegion
+        save()
+    }
+
     // MARK: - Private
 
     private func load() {
@@ -55,13 +63,15 @@ final class PlatformConfigStore {
         authHeader = dict["auth_header"] as? String ?? "Authorization"
         authPrefix = dict["auth_prefix"] as? String ?? "Bearer "
         apiKey = dict["api_key"] as? String
+        region = dict["region"] as? String ?? "domestic"
     }
 
     private func save() {
         var dict: [String: Any] = [
             "api_base_url": apiBaseURL,
             "auth_header": authHeader,
-            "auth_prefix": authPrefix
+            "auth_prefix": authPrefix,
+            "region": region
         ]
         dict["api_key"] = apiKey ?? ""
         UserDefaults.standard.set(dict, forKey: defaultsKey)
@@ -83,6 +93,9 @@ final class PlatformConfigStore {
         }
         if let prefix = json["auth_prefix"] as? String {
             authPrefix = prefix
+        }
+        if let templateRegion = json["region"] as? String {
+            region = templateRegion
         }
         save()
     }

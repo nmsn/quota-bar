@@ -48,5 +48,8 @@
     "error.networkError": "网络错误: %@",
     "error.unauthorized": "认证失败，请检查 Token",
     "error.tokenRequired": "未配置 Token",
+    "config.region": "区域",
+    "config.regionDomestic": "国内",
+    "config.regionInternational": "国际",
     "platform.glm": "GLM"
 }

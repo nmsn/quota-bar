@@ -186,6 +186,10 @@ struct PopoverContentView: View {
             PasteableTextField(text: $viewModel.apiKeyInput, placeholder: I18nService.shared.translate("popover.inputPlaceholder"))
                 .frame(height: 60)
 
+            if viewModel.configPlatform == .glm {
+                regionPicker
+            }
+
             HStack {
                 Button(action: { viewModel.cancelConfig() }) {
                     Image(systemName: "xmark")
@@ -202,6 +206,18 @@ struct PopoverContentView: View {
         .padding()
         .background(Color.accentColor.opacity(0.08))
         .cornerRadius(8)
+    }
+
+    private var regionPicker: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(I18nService.shared.translate("config.region"))
+                .font(.caption.bold())
+            Picker("", selection: $viewModel.regionInput) {
+                Text(I18nService.shared.translate("config.regionDomestic")).tag("domestic")
+                Text(I18nService.shared.translate("config.regionInternational")).tag("international")
+            }
+            .pickerStyle(.segmented)
+        }
     }
 
     // MARK: - Unconfigured Section
