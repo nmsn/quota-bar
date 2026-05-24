@@ -87,3 +87,15 @@ final class PlatformConfigStore {
         save()
     }
 }
+
+extension PlatformType {
+    var isEnabled: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: "quotabar.platform.\(rawValue).enabled") == nil {
+                return self == .minimax  // Only MiniMax enabled by default
+            }
+            return UserDefaults.standard.bool(forKey: "quotabar.platform.\(rawValue).enabled")
+        }
+        set { UserDefaults.standard.set(newValue, forKey: "quotabar.platform.\(rawValue).enabled") }
+    }
+}
