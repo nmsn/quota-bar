@@ -15,12 +15,12 @@ struct PlatformSelectionView: View {
                     get: { platform.isEnabled },
                     set: { newValue in
                         PlatformManager.shared.setPlatformEnabled(newValue, for: platform)
+                        viewModel.fetchAllUsage()
                     }
                 )) {
                     Text(platform.displayName)
                         .font(.body)
                 }
-                .toggleStyle(.checkbox)
             }
 
             Spacer()

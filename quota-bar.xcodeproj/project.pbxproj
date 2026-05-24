@@ -29,6 +29,7 @@
 		7B9F7A49A96A20BA430E9F71 /* minimax.template.json in Resources */ = {isa = PBXBuildFile; fileRef = 5E09575915041C8761C950A8 /* minimax.template.json */; };
 		85765DCDD271D5DAE8D0B153 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93960D7EC9A64DB2D93E0B51 /* Assets.xcassets */; };
 		88E97DF0F0466EAF0A6E21F6 /* DeepSeekPlatformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9BA2A18F8546FC2205290F /* DeepSeekPlatformTests.swift */; };
+		96D5806936DF98E266F18B36 /* PlatformSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E90CE4A6F3ED54CCE03D6A9 /* PlatformSelectionView.swift */; };
 		A54197360F6E7417B40672CF /* PopoverContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A41D4381294E4387649612 /* PopoverContentView.swift */; };
 		CBAE215B27E6F50D399CAD79 /* MiniMaxPlatformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BB6A472EEFCFC450D6A01DD /* MiniMaxPlatformService.swift */; };
 		D563C26F7277F257509324D8 /* MiniMaxPlatformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC84AF777250D37572AF820 /* MiniMaxPlatformTests.swift */; };
@@ -54,6 +55,7 @@
 /* Begin PBXFileReference section */
 		023B1CB564A2E048FD8675F1 /* PlatformViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformViewModelTests.swift; sourceTree = "<group>"; };
 		084DFA337E4B0D33598A6C81 /* PlatformConfigStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformConfigStore.swift; sourceTree = "<group>"; };
+		1E90CE4A6F3ED54CCE03D6A9 /* PlatformSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformSelectionView.swift; sourceTree = "<group>"; };
 		1EC84AF777250D37572AF820 /* MiniMaxPlatformTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxPlatformTests.swift; sourceTree = "<group>"; };
 		38DA4A0A0CBD196B6B81E382 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		3BB6A472EEFCFC450D6A01DD /* MiniMaxPlatformService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxPlatformService.swift; sourceTree = "<group>"; };
@@ -269,6 +271,7 @@
 			isa = PBXGroup;
 			children = (
 				9E85AB9866C741C733FFFDDA /* PasteableTextField.swift */,
+				1E90CE4A6F3ED54CCE03D6A9 /* PlatformSelectionView.swift */,
 				D6A41D4381294E4387649612 /* PopoverContentView.swift */,
 				715D8C3273D5B13081D97EA8 /* StatusBarView.swift */,
 			);
@@ -388,6 +391,7 @@
 				42E1C6AD67AAE7176E49C721 /* PlatformConfigStore.swift in Sources */,
 				70A86445A42753EBF395EC1F /* PlatformManager.swift in Sources */,
 				49479A285BE57D357894C356 /* PlatformProtocol.swift in Sources */,
+				96D5806936DF98E266F18B36 /* PlatformSelectionView.swift in Sources */,
 				4A521FB1AAF129FFA06CBAEE /* PlatformViewModel.swift in Sources */,
 				A54197360F6E7417B40672CF /* PopoverContentView.swift in Sources */,
 				DB54BC12621BD69094F8D1AA /* RightClickStatusBarView.swift in Sources */,

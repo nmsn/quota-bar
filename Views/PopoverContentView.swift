@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PopoverContentView: View {
     @ObservedObject var viewModel: PlatformViewModel
+    @State private var showPlatformSelection = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -34,6 +35,14 @@ struct PopoverContentView: View {
                     .font(.system(size: 12))
                     .rotationEffect(.degrees(360))
                     .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: viewModel.isActivePlatformLoading)
+            }
+
+            Button(action: { showPlatformSelection = true }) {
+                Image(systemName: "checkmark.circle")
+                    .foregroundColor(.secondary)
+            }
+            .popover(isPresented: $showPlatformSelection) {
+                PlatformSelectionView(viewModel: viewModel)
             }
         }
     }
