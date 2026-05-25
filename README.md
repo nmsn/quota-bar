@@ -36,6 +36,8 @@ A macOS menu bar app for viewing multiple AI platform API usage (MiniMax, GLM, D
 ## Requirements
 
 - macOS 14.0 or later
+- App size: ~3.8 MB (DMG: ~1.4 MB)
+- Memory usage: ~30-50 MB
 
 ## Installation
 
