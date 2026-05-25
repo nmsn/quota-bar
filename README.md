@@ -31,6 +31,7 @@ A macOS menu bar app for viewing multiple AI platform API usage (MiniMax, GLM, D
 <img src="screenshot/screenshot.png" width="280" alt="Menu Bar" />
 <img src="screenshot/screenshot2.png" width="280" alt="Popover" />
 <img src="screenshot/screenshot-menu-bar.png" width="280" alt="Platform Selection" />
+<img src="screenshot/screenshot-menu-bar2.png" width="280" alt="Right-click Menu" />
 
 ## Requirements
 

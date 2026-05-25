@@ -31,6 +31,7 @@ macOS 菜单栏应用，支持多平台 API 使用量查看（MiniMax、GLM、De
 <img src="screenshot/screenshot.png" width="280" alt="菜单栏" />
 <img src="screenshot/screenshot2.png" width="280" alt="弹出窗口" />
 <img src="screenshot/screenshot-menu-bar.png" width="280" alt="平台选择" />
+<img src="screenshot/screenshot-menu-bar2.png" width="280" alt="右键菜单" />
 
 ## 系统要求
 
