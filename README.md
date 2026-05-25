@@ -53,4 +53,8 @@ A macOS menu bar app for viewing multiple AI platform API usage (MiniMax, GLM, D
 
 ## License
 
-MIT
+MIT &middot; PRs welcome! Help us add support for more AI platforms.
+
+## Contributing
+
+Want to add support for a new AI platform? Check out our [API reference docs](docs/platform-api-reference.md) and feel free to submit a PR!

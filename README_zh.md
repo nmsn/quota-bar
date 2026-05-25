@@ -53,4 +53,8 @@ macOS 菜单栏应用，支持多平台 API 使用量查看（MiniMax、GLM、De
 
 ## License
 
-MIT
+MIT &middot; 欢迎提交 PR！期待添加更多 AI 平台支持。
+
+## 贡献指南
+
+想要添加新的 AI 平台支持？请查阅我们的 [API 参考文档](docs/platform-api-reference.md)，欢迎提交 PR！
