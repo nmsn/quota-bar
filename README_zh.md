@@ -1,5 +1,7 @@
 # QuotaBar
 
+<img src="Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-128.png" width="96" height="96" align="right" />
+
 [English](./README.md) | 中文
 
 ![macOS](https://img.shields.io/badge/macOS-14.0%2B-blue)
@@ -7,6 +9,7 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Version](https://img.shields.io/github/v/release/nmsn/quota-bar)
 ![Downloads](https://img.shields.io/github/downloads/nmsn/quota-bar/total)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen)](CONTRIBUTING.md)
 
 macOS 菜单栏应用，支持多平台 API 使用量查看（MiniMax、GLM、DeepSeek、Kimi）。
 

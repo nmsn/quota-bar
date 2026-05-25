@@ -1,5 +1,7 @@
 # QuotaBar
 
+<img src="Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-128.png" width="96" height="96" align="right" />
+
 English | [中文](./README_zh.md)
 
 ![macOS](https://img.shields.io/badge/macOS-14.0%2B-blue)
@@ -7,6 +9,7 @@ English | [中文](./README_zh.md)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Version](https://img.shields.io/github/v/release/nmsn/quota-bar)
 ![Downloads](https://img.shields.io/github/downloads/nmsn/quota-bar/total)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen)](CONTRIBUTING.md)
 
 A macOS menu bar app for viewing multiple AI platform API usage (MiniMax, GLM, DeepSeek, Kimi).
 
