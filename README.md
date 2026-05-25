@@ -26,6 +26,12 @@ A macOS menu bar app for viewing multiple AI platform API usage (MiniMax, GLM, D
 - API Token configuration and management
 - Sparkle auto-update support
 
+## Screenshots
+
+<img src="screenshot/screenshot.png" width="280" alt="Menu Bar" />
+<img src="screenshot/screenshot-menu-bar.png" width="280" alt="Popover" />
+<img src="screenshot/screenshot2..png" width="280" alt="Platform Selection" />
+
 ## Requirements
 
 - macOS 14.0 or later

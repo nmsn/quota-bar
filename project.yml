@@ -25,6 +25,7 @@ targets:
       - path: Models
       - path: Resources
       - path: Services
+      - path: screenshot
       - path: StatusBar
       - path: ViewModels
       - path: Views
