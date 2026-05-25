@@ -29,7 +29,7 @@ A macOS menu bar app for viewing multiple AI platform API usage (MiniMax, GLM, D
 ## Screenshots
 
 <img src="screenshot/screenshot.png" width="280" alt="Menu Bar" />
-<img src="screenshot/screenshot2..png" width="280" alt="Popover" />
+<img src="screenshot/screenshot2.png" width="280" alt="Popover" />
 <img src="screenshot/screenshot-menu-bar.png" width="280" alt="Platform Selection" />
 
 ## Requirements
@@ -49,34 +49,6 @@ A macOS menu bar app for viewing multiple AI platform API usage (MiniMax, GLM, D
 2. Click the button in the top-right corner to configure API Token
 3. Select a platform and paste the Token
 4. The menu bar will display usage statistics in real-time
-
-## Development
-
-### Build
-
-```bash
-# Install dependencies
-xcodegen generate
-
-# Debug build
-xcodebuild -project quota-bar.xcodeproj -scheme quota-bar -configuration Debug build
-
-# Release build
-xcodebuild -project quota-bar.xcodeproj -scheme quota-bar -configuration Release build
-```
-
-### Package
-
-```bash
-hdiutil create -volname QuotaBar -srcfolder build/Release/QuotaBar.app -ov -format UDZO -o QuotaBar.dmg
-```
-
-## Tech Stack
-
-- Swift + SwiftUI
-- AppKit (NSStatusItem, NSPopover)
-- Sparkle (Auto-update)
-- XcodeGen (Project generation)
 
 ## License
 

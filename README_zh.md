@@ -29,7 +29,7 @@ macOS 菜单栏应用，支持多平台 API 使用量查看（MiniMax、GLM、De
 ## 截图
 
 <img src="screenshot/screenshot.png" width="280" alt="菜单栏" />
-<img src="screenshot/screenshot2..png" width="280" alt="弹出窗口" />
+<img src="screenshot/screenshot2.png" width="280" alt="弹出窗口" />
 <img src="screenshot/screenshot-menu-bar.png" width="280" alt="平台选择" />
 
 ## 系统要求
@@ -49,34 +49,6 @@ macOS 菜单栏应用，支持多平台 API 使用量查看（MiniMax、GLM、De
 2. 在弹出窗口中点击右上角按钮配置 API Token
 3. 选择平台并粘贴 Token
 4. 菜单栏将实时显示使用量
-
-## 开发
-
-### 构建
-
-```bash
-# 安装依赖
-xcodegen generate
-
-# Debug 构建
-xcodebuild -project quota-bar.xcodeproj -scheme quota-bar -configuration Debug build
-
-# Release 构建
-xcodebuild -project quota-bar.xcodeproj -scheme quota-bar -configuration Release build
-```
-
-### 打包
-
-```bash
-hdiutil create -volname QuotaBar -srcfolder build/Release/QuotaBar.app -ov -format UDZO -o QuotaBar.dmg
-```
-
-## 技术栈
-
-- Swift + SwiftUI
-- AppKit (NSStatusItem, NSPopover)
-- Sparkle (自动更新)
-- XcodeGen (项目生成)
 
 ## License
 
