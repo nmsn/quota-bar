@@ -29,6 +29,6 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>https://nmsn.github.io/minimax-bar/appcast.xml</string>
+	<string>https://nmsn.github.io/quota-bar/appcast.xml</string>
 </dict>
 </plist>
