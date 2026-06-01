@@ -57,7 +57,7 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
             throw PlatformError.decodingError(config.platformType, error.localizedDescription)
         }
 
-        guard let modelData = apiResponse.modelRemains?.first else {
+        guard let modelData = apiResponse.modelRemains?.first(where: { $0.modelName == "general" }) else {
             throw PlatformError.invalidResponse(config.platformType)
         }
 
@@ -79,27 +79,41 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
     }
 
     private func parseUsageData(from model: ModelRemain, platform: PlatformType) -> PlatformUsageData {
-        let dailyTotal = Double(model.currentIntervalTotalCount ?? 0)
-        let dailyUsed = Double(model.currentIntervalUsageCount ?? 0)
-        let weeklyTotal = Double(model.currentWeeklyTotalCount ?? 0)
-        let weeklyUsed = Double(model.currentWeeklyUsageCount ?? 0)
+        // 新接口: remaining_percent (0-100), 转换为已用百分比
+        let dailyRemainingPct = model.currentIntervalRemainingPercent ?? 0
+        let weeklyRemainingPct = model.currentWeeklyRemainingPercent ?? 0
 
-        let resetMs = model.remainsTime ?? 0
-        let weeklyResetMs = model.weeklyRemainsTime ?? 0
+        let dailyUsedPct = 100.0 - dailyRemainingPct
+        let weeklyUsedPct = 100.0 - weeklyRemainingPct
+
+        // 重置时间: 新接口用绝对时间戳(毫秒), 旧接口用相对毫秒
         let now = Date()
+        let dailyResetTime: Date?
+        if let endTimeMs = model.endTime, endTimeMs > 0 {
+            dailyResetTime = Date(timeIntervalSince1970: Double(endTimeMs) / 1000.0)
+        } else if let remainsMs = model.remainsTime, remainsMs > 0 {
+            dailyResetTime = now.addingTimeInterval(Double(remainsMs) / 1000.0)
+        } else {
+            dailyResetTime = nil
+        }
 
-        let dailyResetTime = resetMs > 0 ? now.addingTimeInterval(Double(resetMs) / 1000.0) : nil
-        let weeklyResetTime = weeklyResetMs > 0 ? now.addingTimeInterval(Double(weeklyResetMs) / 1000.0) : nil
+        let weeklyResetTime: Date?
+        if let weeklyEndTimeMs = model.weeklyEndTime, weeklyEndTimeMs > 0 {
+            weeklyResetTime = Date(timeIntervalSince1970: Double(weeklyEndTimeMs) / 1000.0)
+        } else if let weeklyRemainsMs = model.weeklyRemainsTime, weeklyRemainsMs > 0 {
+            weeklyResetTime = now.addingTimeInterval(Double(weeklyRemainsMs) / 1000.0)
+        } else {
+            weeklyResetTime = nil
+        }
 
-        let dailyPercentage = dailyTotal > 0 ? (dailyTotal - dailyUsed) / dailyTotal : 0
-        let isHealthy = dailyPercentage < 0.85
+        let isHealthy = dailyRemainingPct < 15.0
 
         return PlatformUsageData(
             platform: platform,
             displayName: platform.displayName,
             metrics: [
-                UsageMetric(label: "five_hour", currentValue: dailyUsed, totalValue: dailyTotal, unit: "requests", resetTime: dailyResetTime),
-                UsageMetric(label: "weekly_limit", currentValue: weeklyUsed, totalValue: weeklyTotal, unit: "requests", resetTime: weeklyResetTime)
+                UsageMetric(label: "five_hour", currentValue: dailyRemainingPct, totalValue: 100, unit: "requests", resetTime: dailyResetTime),
+                UsageMetric(label: "weekly_limit", currentValue: weeklyRemainingPct, totalValue: 100, unit: "requests", resetTime: weeklyResetTime)
             ],
             lastUpdated: Date(),
             isHealthy: isHealthy
