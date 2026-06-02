@@ -21,9 +21,11 @@
 		42E1C6AD67AAE7176E49C721 /* PlatformConfigStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084DFA337E4B0D33598A6C81 /* PlatformConfigStore.swift */; };
 		49479A285BE57D357894C356 /* PlatformProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A7945B2EC582481E4890AB9 /* PlatformProtocol.swift */; };
 		4A521FB1AAF129FFA06CBAEE /* PlatformViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4D9A5A65B4179E96448AC5 /* PlatformViewModel.swift */; };
+		4D2C5009C27AEE8BB48B7BEE /* screenshot.png in Resources */ = {isa = PBXBuildFile; fileRef = 95B7500E09285793963B8C5F /* screenshot.png */; };
 		5008833BE4D8082D7B4C5002 /* DeepSeekPlatformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA77CB8A39F9F733DE162CA /* DeepSeekPlatformService.swift */; };
 		58364B1777039DCB55E000A6 /* MockNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6421AA3B46B6ABC036E35B08 /* MockNetworkService.swift */; };
 		668370A397BDCB1AE77C5EEC /* deepseek.template.json in Resources */ = {isa = PBXBuildFile; fileRef = 61D9F2B9E94505F6C4EB00D4 /* deepseek.template.json */; };
+		67C9F61ADDD4F53FF8C57649 /* screenshot2.png in Resources */ = {isa = PBXBuildFile; fileRef = BE73787319F749A39F9088CB /* screenshot2.png */; };
 		70A86445A42753EBF395EC1F /* PlatformManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB8718DDB1B372AE925CD47 /* PlatformManager.swift */; };
 		70B75C2AD8FC2C63DD4BD3ED /* PlatformViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023B1CB564A2E048FD8675F1 /* PlatformViewModelTests.swift */; };
 		76EB5EDE61066B3E3AB2A569 /* PlatformManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DAD09F5D59074DE76ED748 /* PlatformManagerTests.swift */; };
@@ -31,6 +33,7 @@
 		85765DCDD271D5DAE8D0B153 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93960D7EC9A64DB2D93E0B51 /* Assets.xcassets */; };
 		88E97DF0F0466EAF0A6E21F6 /* DeepSeekPlatformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9BA2A18F8546FC2205290F /* DeepSeekPlatformTests.swift */; };
 		96D5806936DF98E266F18B36 /* PlatformSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E90CE4A6F3ED54CCE03D6A9 /* PlatformSelectionView.swift */; };
+		99C25D75BF42011F4B651B43 /* screenshot-menu-bar.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B17DC33D3E4A48B299CB251 /* screenshot-menu-bar.png */; };
 		A54197360F6E7417B40672CF /* PopoverContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A41D4381294E4387649612 /* PopoverContentView.swift */; };
 		CBAE215B27E6F50D399CAD79 /* MiniMaxPlatformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BB6A472EEFCFC450D6A01DD /* MiniMaxPlatformService.swift */; };
 		D03AB6DC32355C4B61876063 /* glm.template.json in Resources */ = {isa = PBXBuildFile; fileRef = 0A631531F225E0B1404C0F9C /* glm.template.json */; };
@@ -44,6 +47,7 @@
 		F08208070E4DBF348E3F88AB /* UsageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9333674CCC6953CDC896510B /* UsageData.swift */; };
 		F7F8310620A1CCBA5477352E /* zh-Hans.json in Resources */ = {isa = PBXBuildFile; fileRef = 7530C3B7D8FD856FE0584F92 /* zh-Hans.json */; };
 		F828CE8F9CF2CE584DCD590B /* KimiPlatformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 343BA3F2C122111D270D50C1 /* KimiPlatformService.swift */; };
+		FBA3C181804F718C47336DA2 /* screenshot-menu-bar2.png in Resources */ = {isa = PBXBuildFile; fileRef = F034350D366C82B0C45E746C /* screenshot-menu-bar2.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +64,7 @@
 		023B1CB564A2E048FD8675F1 /* PlatformViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformViewModelTests.swift; sourceTree = "<group>"; };
 		084DFA337E4B0D33598A6C81 /* PlatformConfigStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformConfigStore.swift; sourceTree = "<group>"; };
 		0A631531F225E0B1404C0F9C /* glm.template.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = glm.template.json; sourceTree = "<group>"; };
+		1B17DC33D3E4A48B299CB251 /* screenshot-menu-bar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "screenshot-menu-bar.png"; sourceTree = "<group>"; };
 		1E90CE4A6F3ED54CCE03D6A9 /* PlatformSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformSelectionView.swift; sourceTree = "<group>"; };
 		1EC84AF777250D37572AF820 /* MiniMaxPlatformTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxPlatformTests.swift; sourceTree = "<group>"; };
 		343BA3F2C122111D270D50C1 /* KimiPlatformService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KimiPlatformService.swift; sourceTree = "<group>"; };
@@ -83,12 +88,14 @@
 		88AB05E0365F937DAD7E4B42 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9333674CCC6953CDC896510B /* UsageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageData.swift; sourceTree = "<group>"; };
 		93960D7EC9A64DB2D93E0B51 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		95B7500E09285793963B8C5F /* screenshot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = screenshot.png; sourceTree = "<group>"; };
 		9A7945B2EC582481E4890AB9 /* PlatformProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformProtocol.swift; sourceTree = "<group>"; };
 		9C4D9A5A65B4179E96448AC5 /* PlatformViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformViewModel.swift; sourceTree = "<group>"; };
 		9C9BA2A18F8546FC2205290F /* DeepSeekPlatformTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekPlatformTests.swift; sourceTree = "<group>"; };
 		9CB8718DDB1B372AE925CD47 /* PlatformManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformManager.swift; sourceTree = "<group>"; };
 		9E85AB9866C741C733FFFDDA /* PasteableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteableTextField.swift; sourceTree = "<group>"; };
 		A98E64CFC0C8846ECA523CCE /* ConfigServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigServiceTests.swift; sourceTree = "<group>"; };
+		BE73787319F749A39F9088CB /* screenshot2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = screenshot2.png; sourceTree = "<group>"; };
 		C0A3DBA8DE8F526ED1553758 /* ConfigService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigService.swift; sourceTree = "<group>"; };
 		C28AC691014D3A92A1B45891 /* I18nService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = I18nService.swift; sourceTree = "<group>"; };
 		CB58DE1F6EE0E55B6A31E060 /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
@@ -96,6 +103,7 @@
 		D6A41D4381294E4387649612 /* PopoverContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverContentView.swift; sourceTree = "<group>"; };
 		E6DAD09F5D59074DE76ED748 /* PlatformManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformManagerTests.swift; sourceTree = "<group>"; };
 		E7B2CA57DC0C6A9169BD1F81 /* en.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = en.json; sourceTree = "<group>"; };
+		F034350D366C82B0C45E746C /* screenshot-menu-bar2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "screenshot-menu-bar2.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +165,7 @@
 				A20188A371DB5D5CA8B39ED7 /* App */,
 				306B247C91CF9EBE08511E64 /* Models */,
 				20C767B28B080E9840B1660E /* Resources */,
+				A134CC291908D44EA707A61D /* screenshot */,
 				4A4F64F4CA193CDD8285B2DE /* Services */,
 				1A1B8886C36881CDF0E10420 /* StatusBar */,
 				3BA673ED36BC8B6D73DC517B /* Tests */,
@@ -258,6 +267,17 @@
 				7B63EF1839A44BB7F0BFBBE1 /* RefreshIntervalTests.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		A134CC291908D44EA707A61D /* screenshot */ = {
+			isa = PBXGroup;
+			children = (
+				1B17DC33D3E4A48B299CB251 /* screenshot-menu-bar.png */,
+				F034350D366C82B0C45E746C /* screenshot-menu-bar2.png */,
+				95B7500E09285793963B8C5F /* screenshot.png */,
+				BE73787319F749A39F9088CB /* screenshot2.png */,
+			);
+			path = screenshot;
 			sourceTree = "<group>";
 		};
 		A20188A371DB5D5CA8B39ED7 /* App */ = {
@@ -401,6 +421,10 @@
 				D03AB6DC32355C4B61876063 /* glm.template.json in Resources */,
 				E22E2E04B3073CC1359D244D /* kimi.template.json in Resources */,
 				7B9F7A49A96A20BA430E9F71 /* minimax.template.json in Resources */,
+				99C25D75BF42011F4B651B43 /* screenshot-menu-bar.png in Resources */,
+				FBA3C181804F718C47336DA2 /* screenshot-menu-bar2.png in Resources */,
+				4D2C5009C27AEE8BB48B7BEE /* screenshot.png in Resources */,
+				67C9F61ADDD4F53FF8C57649 /* screenshot2.png in Resources */,
 				F7F8310620A1CCBA5477352E /* zh-Hans.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -612,14 +636,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quota.statusbar;
 				PRODUCT_NAME = QuotaBar;
 				SDKROOT = macosx;
@@ -632,14 +656,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quota.statusbar;
 				PRODUCT_NAME = QuotaBar;
 				SDKROOT = macosx;
