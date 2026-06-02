@@ -27,7 +27,7 @@ struct PopoverContentView: View {
 
     private var headerSection: some View {
         HStack {
-            Text("QuotaBar")
+            Text(I18nService.shared.translate("app.name"))
                 .font(.headline)
             Spacer()
             if viewModel.isActivePlatformLoading {
@@ -116,7 +116,7 @@ struct PopoverContentView: View {
 
     private func metricCard(_ metric: UsageMetric) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Label(metric.label, systemImage: metricIcon(metric))
+            Label(metricDisplayLabel(metric), systemImage: metricIcon(metric))
                 .font(.caption.bold())
 
             HStack {
@@ -146,20 +146,26 @@ struct PopoverContentView: View {
 
     private func metricIcon(_ metric: UsageMetric) -> String {
         switch metric.label {
-        case "Daily": return "sun.max"
-        case "Weekly": return "calendar"
-        case "Balance": return "dollarsign.circle"
-        default: return "chart.bar"
+        case "five_hour": return "clock"
+        case "weekly_limit": return "calendar"
+        default: return "dollarsign.circle"  // 货币余额 (DeepSeek CNY/USD 等)
         }
     }
 
     private func metricColor(_ metric: UsageMetric) -> Color {
         switch metric.label {
-        case "Daily": return .orange
-        case "Weekly": return .blue
-        case "Balance": return .green
-        default: return .gray
+        case "five_hour": return .orange
+        case "weekly_limit": return .blue
+        default: return .green  // 货币余额
         }
+    }
+
+    /// 把 service 生成的 key (five_hour / weekly_limit / 货币代码) 翻译成本地化文本
+    private func metricDisplayLabel(_ metric: UsageMetric) -> String {
+        let key = "metric." + metric.label
+        let translated = I18nService.shared.translate(key)
+        // 翻译命中: i18n 返回 localized string; 未命中时返回 key 自身, 此时回退到原始 label (如货币代码 CNY/USD)
+        return translated == key ? metric.label : translated
     }
 
     // MARK: - Status
