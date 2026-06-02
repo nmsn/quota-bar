@@ -18,25 +18,25 @@ class RightClickStatusBarView: NSView {
     }
 
     private func setupView() {
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(hostingView)
+
+        // 高亮 overlay 放在 hostingView 之上, 保证可见;
+        // hitTest 返回 nil 让鼠标事件穿透到 RightClickStatusBarView 自身
         highlightView.translatesAutoresizingMaskIntoConstraints = false
         highlightView.isHidden = true
         addSubview(highlightView)
 
-        hostingView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(hostingView)
-        // 高亮 overlay 放在 hostingView 之下, 通过 SwiftUI 透明背景透出
-        hostingView.layer?.backgroundColor = .clear
-
         NSLayoutConstraint.activate([
-            highlightView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            highlightView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            highlightView.topAnchor.constraint(equalTo: topAnchor),
-            highlightView.bottomAnchor.constraint(equalTo: bottomAnchor),
-
             hostingView.leadingAnchor.constraint(equalTo: leadingAnchor),
             hostingView.trailingAnchor.constraint(equalTo: trailingAnchor),
             hostingView.topAnchor.constraint(equalTo: topAnchor),
-            hostingView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            hostingView.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+            highlightView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            highlightView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            highlightView.topAnchor.constraint(equalTo: topAnchor),
+            highlightView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
 
@@ -75,6 +75,11 @@ private final class HighlightOverlayView: NSView {
 
     override var isFlipped: Bool { true }
     override var isOpaque: Bool { false }
+
+    // 高亮只用于视觉, 不接收鼠标事件 — 让事件穿透到下层的 hostingView / 父视图
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        return nil
+    }
 
     override func draw(_ dirtyRect: NSRect) {
         let path = NSBezierPath(
