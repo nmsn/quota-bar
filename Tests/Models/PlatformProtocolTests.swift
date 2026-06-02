@@ -3,18 +3,24 @@ import XCTest
 
 final class PlatformProtocolTests: XCTestCase {
     func testPlatformTypeDisplayNames() {
-        XCTAssertEqual(PlatformType.minimax_cn.displayName, "MiniMax")
+        XCTAssertEqual(PlatformType.minimax_cn.displayName, "MiniMax (CN)")
+        XCTAssertEqual(PlatformType.minimax_en.displayName, "MiniMax (EN)")
         XCTAssertEqual(PlatformType.deepseek.displayName, "DeepSeek")
     }
 
     func testPlatformTypeAllCases() {
-        XCTAssertEqual(PlatformType.allCases.count, 2)
+        XCTAssertEqual(PlatformType.allCases.count, 6)
         XCTAssertTrue(PlatformType.allCases.contains(.minimax_cn))
+        XCTAssertTrue(PlatformType.allCases.contains(.minimax_en))
         XCTAssertTrue(PlatformType.allCases.contains(.deepseek))
+        XCTAssertTrue(PlatformType.allCases.contains(.glm_cn))
+        XCTAssertTrue(PlatformType.allCases.contains(.glm_en))
+        XCTAssertTrue(PlatformType.allCases.contains(.kimi))
     }
 
     func testPlatformTypeRawValues() {
-        XCTAssertEqual(PlatformType.minimax_cn.rawValue, "minimax")
+        XCTAssertEqual(PlatformType.minimax_cn.rawValue, "minimax_cn")
+        XCTAssertEqual(PlatformType.minimax_en.rawValue, "minimax_en")
         XCTAssertEqual(PlatformType.deepseek.rawValue, "deepseek")
     }
 

@@ -8,9 +8,10 @@ final class PlatformViewModelTests: XCTestCase {
         XCTAssertTrue(PlatformType.allCases.contains(viewModel.activePlatform))
     }
 
-    func testAllPlatformsReturnsAll() {
+    func testAllPlatformsReturnsEnabledPlatforms() {
         let viewModel = PlatformViewModel()
-        XCTAssertEqual(viewModel.allPlatforms.count, PlatformType.allCases.count)
+        let enabledCount = PlatformType.allCases.filter { $0.isEnabled }.count
+        XCTAssertEqual(viewModel.allPlatforms.count, enabledCount)
     }
 
     func testConfiguredPlatformsReturnsArray() {
@@ -28,7 +29,7 @@ final class PlatformViewModelTests: XCTestCase {
 
     func testPlatformDisplayName() {
         let viewModel = PlatformViewModel()
-        XCTAssertEqual(viewModel.platformDisplayName(.minimax_cn), "MiniMax")
+        XCTAssertEqual(viewModel.platformDisplayName(.minimax_cn), "MiniMax (CN)")
         XCTAssertEqual(viewModel.platformDisplayName(.deepseek), "DeepSeek")
     }
 
