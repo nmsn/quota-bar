@@ -21,7 +21,7 @@ final class PlatformManagerTests: XCTestCase {
 
     func testClearCacheDoesNotCrash() {
         let manager = PlatformManager()
-        manager.clearCache(for: .minimax)
+        manager.clearCache(for: .minimax_cn)
         manager.clearCache(for: .deepseek)
         manager.clearAllCaches()
     }

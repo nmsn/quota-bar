@@ -34,7 +34,7 @@ final class MiniMaxPlatformTests: XCTestCase {
         mockNetwork.mockResponse = MockNetworkService.makeResponse(url: "https://test.com", statusCode: 200)
 
         let config = PlatformConfigData(
-            platformType: .minimax,
+            platformType: .minimax_cn,
             apiBaseURL: "https://test.com",
             authHeader: "Authorization",
             authPrefix: "Bearer ",
@@ -43,7 +43,7 @@ final class MiniMaxPlatformTests: XCTestCase {
 
         let result = try await service.fetchUsage(config: config, network: mockNetwork)
 
-        XCTAssertEqual(result.platform, .minimax)
+        XCTAssertEqual(result.platform, .minimax_cn)
         XCTAssertEqual(result.metrics.count, 2)
         // general 桶: remaining 98% → currentValue=98, totalValue=100
         XCTAssertEqual(result.metrics[0].label, "five_hour")
@@ -59,7 +59,7 @@ final class MiniMaxPlatformTests: XCTestCase {
 
     func testFetchUsageNotConfigured() async {
         let config = PlatformConfigData(
-            platformType: .minimax,
+            platformType: .minimax_cn,
             apiBaseURL: "https://test.com",
             authHeader: "Authorization",
             authPrefix: "Bearer ",
@@ -70,7 +70,7 @@ final class MiniMaxPlatformTests: XCTestCase {
             _ = try await service.fetchUsage(config: config, network: mockNetwork)
             XCTFail("Should throw notConfigured")
         } catch {
-            XCTAssertEqual(error as? PlatformError, PlatformError.notConfigured(.minimax))
+            XCTAssertEqual(error as? PlatformError, PlatformError.notConfigured(.minimax_cn))
         }
     }
 
@@ -79,7 +79,7 @@ final class MiniMaxPlatformTests: XCTestCase {
         mockNetwork.mockResponse = MockNetworkService.makeResponse(url: "https://test.com", statusCode: 401)
 
         let config = PlatformConfigData(
-            platformType: .minimax,
+            platformType: .minimax_cn,
             apiBaseURL: "https://test.com",
             authHeader: "Authorization",
             authPrefix: "Bearer ",
@@ -90,7 +90,7 @@ final class MiniMaxPlatformTests: XCTestCase {
             _ = try await service.fetchUsage(config: config, network: mockNetwork)
             XCTFail("Should throw unauthorized")
         } catch {
-            XCTAssertEqual(error as? PlatformError, PlatformError.unauthorized(.minimax))
+            XCTAssertEqual(error as? PlatformError, PlatformError.unauthorized(.minimax_cn))
         }
     }
 
@@ -98,7 +98,7 @@ final class MiniMaxPlatformTests: XCTestCase {
         mockNetwork.mockError = URLError(.notConnectedToInternet)
 
         let config = PlatformConfigData(
-            platformType: .minimax,
+            platformType: .minimax_cn,
             apiBaseURL: "https://test.com",
             authHeader: "Authorization",
             authPrefix: "Bearer ",
@@ -122,7 +122,7 @@ final class MiniMaxPlatformTests: XCTestCase {
         mockNetwork.mockResponse = MockNetworkService.makeResponse(url: "https://test.com", statusCode: 200)
 
         let config = PlatformConfigData(
-            platformType: .minimax,
+            platformType: .minimax_cn,
             apiBaseURL: "https://test.com",
             authHeader: "Authorization",
             authPrefix: "Bearer ",
@@ -155,7 +155,7 @@ final class MiniMaxPlatformTests: XCTestCase {
         mockNetwork.mockResponse = MockNetworkService.makeResponse(url: "https://test.com", statusCode: 200)
 
         let config = PlatformConfigData(
-            platformType: .minimax,
+            platformType: .minimax_cn,
             apiBaseURL: "https://test.com",
             authHeader: "Authorization",
             authPrefix: "Bearer ",
@@ -191,7 +191,7 @@ final class MiniMaxPlatformTests: XCTestCase {
         mockNetwork.mockResponse = MockNetworkService.makeResponse(url: "https://test.com", statusCode: 200)
 
         let config = PlatformConfigData(
-            platformType: .minimax,
+            platformType: .minimax_cn,
             apiBaseURL: "https://test.com",
             authHeader: "Authorization",
             authPrefix: "Bearer ",
@@ -203,6 +203,48 @@ final class MiniMaxPlatformTests: XCTestCase {
         // 取的是 general 桶 (80%/70%), 不是 video (50%/50%)
         XCTAssertEqual(result.metrics[0].currentValue, 80.0)
         XCTAssertEqual(result.metrics[1].currentValue, 70.0)
+    }
+
+    func testIsHealthyThreshold() async throws {
+        // 健康阈值 = 15% 剩余: >= 15% → isHealthy = true, < 15% → isHealthy = false
+        let cases: [(remaining: Double, expectedHealthy: Bool)] = [
+            (50.0, true),    // 充足
+            (15.0, true),    // 临界值
+            (14.9, false),   // 临界值下
+            (5.0, false),    // 偏低
+            (0.0, false)     // 用尽
+        ]
+
+        for (index, tc) in cases.enumerated() {
+            // service 有 10s 缓存, 每次迭代前清掉, 避免拿到上次的 result
+            service.clearCache()
+
+            let json = """
+            {
+                "model_remains": [{
+                    "model_name": "general",
+                    "current_interval_remaining_percent": \(tc.remaining),
+                    "current_weekly_remaining_percent": 80.0
+                }]
+            }
+            """
+            mockNetwork.mockData = json.data(using: .utf8)
+            mockNetwork.mockResponse = MockNetworkService.makeResponse(url: "https://test.com", statusCode: 200)
+
+            let config = PlatformConfigData(
+                platformType: .minimax_cn,
+                apiBaseURL: "https://test.com",
+                authHeader: "Authorization",
+                authPrefix: "Bearer ",
+                apiKey: "test-key"
+            )
+
+            let result = try await service.fetchUsage(config: config, network: mockNetwork)
+            XCTAssertEqual(
+                result.isHealthy, tc.expectedHealthy,
+                "case[\(index)] remaining=\(tc.remaining)%, expected isHealthy=\(tc.expectedHealthy)"
+            )
+        }
     }
 
     func testFetchUsageMissingGeneralReturnsError() async {
@@ -220,7 +262,7 @@ final class MiniMaxPlatformTests: XCTestCase {
         mockNetwork.mockResponse = MockNetworkService.makeResponse(url: "https://test.com", statusCode: 200)
 
         let config = PlatformConfigData(
-            platformType: .minimax,
+            platformType: .minimax_cn,
             apiBaseURL: "https://test.com",
             authHeader: "Authorization",
             authPrefix: "Bearer ",
@@ -231,7 +273,7 @@ final class MiniMaxPlatformTests: XCTestCase {
             _ = try await service.fetchUsage(config: config, network: mockNetwork)
             XCTFail("Should throw invalidResponse")
         } catch {
-            XCTAssertEqual(error as? PlatformError, PlatformError.invalidResponse(.minimax))
+            XCTAssertEqual(error as? PlatformError, PlatformError.invalidResponse(.minimax_cn))
         }
     }
 }
