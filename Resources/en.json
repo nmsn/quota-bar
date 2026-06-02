@@ -47,6 +47,7 @@
     "status.healthy": "Normal",
     "error.notConfigured": "Token not configured. Please configure first.",
     "error.invalidResponse": "Invalid response data.",
+    "error.apiError": "API error: %@",
     "error.networkError": "Network error: %@",
     "error.unauthorized": "Authentication failed. Please check your Token.",
     "error.tokenRequired": "Token not configured.",

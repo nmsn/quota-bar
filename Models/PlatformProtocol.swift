@@ -36,6 +36,7 @@ enum PlatformError: Error, Equatable {
     case networkError(PlatformType, String)
     case unauthorized(PlatformType)
     case decodingError(PlatformType, String)
+    case apiError(PlatformType, String)
 }
 
 extension PlatformError: LocalizedError {
@@ -51,6 +52,8 @@ extension PlatformError: LocalizedError {
             return I18nService.shared.translate("error.unauthorized")
         case .decodingError(_, let message):
             return String(format: I18nService.shared.translate("error.networkError"), message)
+        case .apiError(_, let message):
+            return String(format: I18nService.shared.translate("error.apiError"), message)
         }
     }
 }

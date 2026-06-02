@@ -20,12 +20,14 @@ final class MiniMaxPlatformTests: XCTestCase {
                     "current_interval_remaining_percent": 98.0,
                     "current_weekly_remaining_percent": 95.0,
                     "end_time": 1780329600000,
-                    "weekly_end_time": 1780848000000
+                    "weekly_end_time": 1780848000000,
+                    "current_weekly_status": 1
                 },
                 {
                     "model_name": "video",
                     "current_interval_remaining_percent": 100.0,
-                    "current_weekly_remaining_percent": 100.0
+                    "current_weekly_remaining_percent": 100.0,
+                    "current_weekly_status": 1
                 }
             ]
         }
@@ -182,7 +184,8 @@ final class MiniMaxPlatformTests: XCTestCase {
                 {
                     "model_name": "general",
                     "current_interval_remaining_percent": 80.0,
-                    "current_weekly_remaining_percent": 70.0
+                    "current_weekly_remaining_percent": 70.0,
+                    "current_weekly_status": 1
                 }
             ]
         }
@@ -247,15 +250,11 @@ final class MiniMaxPlatformTests: XCTestCase {
         }
     }
 
-    func testFetchUsageMissingGeneralReturnsError() async {
-        // 只有 video, 没有 general → 应抛出 invalidResponse
+    func testFetchUsageEmptyModelRemainsThrowsInvalidResponse() async {
+        // 完全空的 model_remains → 仍应抛出 invalidResponse
         let json = """
         {
-            "model_remains": [{
-                "model_name": "video",
-                "current_interval_remaining_percent": 100.0,
-                "current_weekly_remaining_percent": 100.0
-            }]
+            "model_remains": []
         }
         """
         mockNetwork.mockData = json.data(using: .utf8)
@@ -275,5 +274,93 @@ final class MiniMaxPlatformTests: XCTestCase {
         } catch {
             XCTAssertEqual(error as? PlatformError, PlatformError.invalidResponse(.minimax_cn))
         }
+    }
+
+    func testFetchUsageMissingGeneralFallsBackToFirstItem() async throws {
+        // 没有 general 但有 video → 回退到第一个 item, 不报错 (防御性, 跟上游 cc-switch 行为对齐)
+        let json = """
+        {
+            "model_remains": [{
+                "model_name": "video",
+                "current_interval_remaining_percent": 75.0,
+                "current_weekly_remaining_percent": 50.0,
+                "current_weekly_status": 1
+            }]
+        }
+        """
+        mockNetwork.mockData = json.data(using: .utf8)
+        mockNetwork.mockResponse = MockNetworkService.makeResponse(url: "https://test.com", statusCode: 200)
+
+        let config = PlatformConfigData(
+            platformType: .minimax_cn,
+            apiBaseURL: "https://test.com",
+            authHeader: "Authorization",
+            authPrefix: "Bearer ",
+            apiKey: "test-key"
+        )
+
+        let result = try await service.fetchUsage(config: config, network: mockNetwork)
+        // 取 video 桶的 75%, 不抛错
+        XCTAssertEqual(result.metrics.count, 2)
+        XCTAssertEqual(result.metrics[0].currentValue, 75.0)
+    }
+
+    func testFetchUsageApiErrorFromBaseResp() async {
+        // base_resp.status_code != 0 → 应抛 apiError, 而不是 invalidResponse
+        let json = """
+        {
+            "base_resp": { "status_code": 1004, "status_msg": "no coding plan access" },
+            "model_remains": []
+        }
+        """
+        mockNetwork.mockData = json.data(using: .utf8)
+        mockNetwork.mockResponse = MockNetworkService.makeResponse(url: "https://test.com", statusCode: 200)
+
+        let config = PlatformConfigData(
+            platformType: .minimax_cn,
+            apiBaseURL: "https://test.com",
+            authHeader: "Authorization",
+            authPrefix: "Bearer ",
+            apiKey: "test-key"
+        )
+
+        do {
+            _ = try await service.fetchUsage(config: config, network: mockNetwork)
+            XCTFail("Should throw apiError")
+        } catch {
+            XCTAssertEqual(
+                error as? PlatformError,
+                PlatformError.apiError(.minimax_cn, "no coding plan access")
+            )
+        }
+    }
+
+    func testFetchUsageWeeklyOmittedWhenStatusIsNotOne() async throws {
+        // current_weekly_status 不是 1 (例如 3 = 无周限额 plan) → 只返回 5h, 不返回 weekly
+        let json = """
+        {
+            "model_remains": [{
+                "model_name": "general",
+                "current_interval_remaining_percent": 80.0,
+                "current_weekly_remaining_percent": 50.0,
+                "current_weekly_status": 3
+            }]
+        }
+        """
+        service.clearCache()
+        mockNetwork.mockData = json.data(using: .utf8)
+        mockNetwork.mockResponse = MockNetworkService.makeResponse(url: "https://test.com", statusCode: 200)
+
+        let config = PlatformConfigData(
+            platformType: .minimax_cn,
+            apiBaseURL: "https://test.com",
+            authHeader: "Authorization",
+            authPrefix: "Bearer ",
+            apiKey: "test-key"
+        )
+
+        let result = try await service.fetchUsage(config: config, network: mockNetwork)
+        XCTAssertEqual(result.metrics.count, 1, "weekly metric should be omitted when current_weekly_status != 1")
+        XCTAssertEqual(result.metrics[0].label, "five_hour")
     }
 }

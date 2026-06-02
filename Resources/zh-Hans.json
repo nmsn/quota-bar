@@ -47,6 +47,7 @@
     "status.healthy": "正常使用",
     "error.notConfigured": "未配置 Token，请先配置",
     "error.invalidResponse": "无效的响应数据",
+    "error.apiError": "API 错误：%@",
     "error.networkError": "网络错误: %@",
     "error.unauthorized": "认证失败，请检查 Token",
     "error.tokenRequired": "未配置 Token",
