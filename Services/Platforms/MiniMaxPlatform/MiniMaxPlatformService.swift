@@ -57,9 +57,21 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
             throw PlatformError.decodingError(config.platformType, error.localizedDescription)
         }
 
-        guard let modelData = apiResponse.modelRemains?.first(where: { $0.modelName == "general" }) else {
+        // 检查 API 业务状态码 (base_resp.status_code). 非 0 表示账户欠费、key 失效、
+        // plan 暂停等业务错误, 此时直接给用户看 status_msg, 比笼统的"无效响应"更有用.
+        if let baseResp = apiResponse.baseResp, baseResp.statusCode != 0 {
+            let message = baseResp.statusMsg?.isEmpty == false
+                ? baseResp.statusMsg!
+                : "status_code \(baseResp.statusCode)"
+            throw PlatformError.apiError(config.platformType, message)
+        }
+
+        // 找不到 model_name == "general" 时回退到第一个 item, 而不是直接报错.
+        // 跟上游 cc-switch 行为对齐, 防止 API 微调 model_name 时整个 panel 直接挂掉.
+        guard let modelRemains = apiResponse.modelRemains, !modelRemains.isEmpty else {
             throw PlatformError.invalidResponse(config.platformType)
         }
+        let modelData = modelRemains.first(where: { $0.modelName == "general" }) ?? modelRemains[0]
 
         let usageData = parseUsageData(from: modelData, platform: config.platformType)
         cache = (usageData, Date())
@@ -82,9 +94,6 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
         // 新接口: remaining_percent (0-100), 转换为已用百分比
         let dailyRemainingPct = model.currentIntervalRemainingPercent ?? 0
         let weeklyRemainingPct = model.currentWeeklyRemainingPercent ?? 0
-
-        let dailyUsedPct = 100.0 - dailyRemainingPct
-        let weeklyUsedPct = 100.0 - weeklyRemainingPct
 
         // 重置时间: 新接口用绝对时间戳(毫秒), 旧接口用相对毫秒
         let now = Date()
@@ -109,13 +118,23 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
         // 剩余 >= 15% 视为健康 (UI 显示"正常" + 绿色), 低于 15% 触发"偏低"红色提示
         let isHealthy = dailyRemainingPct >= 15.0
 
+        // 5 小时窗口永远存在
+        var metrics: [UsageMetric] = [
+            UsageMetric(label: "five_hour", currentValue: dailyRemainingPct, totalValue: 100, unit: "%", resetTime: dailyResetTime)
+        ]
+
+        // 周限额仅在 current_weekly_status == 1 时展示. 其它值(包括 nil)表示该 plan
+        // 无周限额 — 跟上游 cc-switch 的语义对齐, 避免展示过时的/随机的 weekly 数据.
+        if model.currentWeeklyStatus == 1 {
+            metrics.append(
+                UsageMetric(label: "weekly_limit", currentValue: weeklyRemainingPct, totalValue: 100, unit: "%", resetTime: weeklyResetTime)
+            )
+        }
+
         return PlatformUsageData(
             platform: platform,
             displayName: platform.displayName,
-            metrics: [
-                UsageMetric(label: "five_hour", currentValue: dailyRemainingPct, totalValue: 100, unit: "%", resetTime: dailyResetTime),
-                UsageMetric(label: "weekly_limit", currentValue: weeklyRemainingPct, totalValue: 100, unit: "%", resetTime: weeklyResetTime)
-            ],
+            metrics: metrics,
             lastUpdated: Date(),
             isHealthy: isHealthy
         )
