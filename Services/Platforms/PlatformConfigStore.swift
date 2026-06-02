@@ -62,10 +62,16 @@ final class PlatformConfigStore {
 
     private func load() {
         guard let anyValue = UserDefaults.standard.object(forKey: defaultsKey) else { return }
-        guard let dict = anyValue as? [String: Any] else {
+        guard var dict = anyValue as? [String: Any] else {
             // Data corruption: stored value is not a dictionary, reset it
             UserDefaults.standard.removeObject(forKey: defaultsKey)
             return
+        }
+        // Strip NSNull values left by a previous bug and re-save the cleaned dict
+        let hasNSNull = dict.values.contains { $0 is NSNull }
+        if hasNSNull {
+            dict = dict.filter { !($0.value is NSNull) }
+            UserDefaults.standard.set(dict, forKey: defaultsKey)
         }
         apiBaseURL = dict["api_base_url"] as? String ?? ""
         apiBaseURLInternational = dict["api_base_url_international"] as? String
@@ -78,11 +84,13 @@ final class PlatformConfigStore {
     private func save() {
         var dict: [String: Any] = [
             "api_base_url": apiBaseURL,
-            "api_base_url_international": apiBaseURLInternational as Any,
             "auth_header": authHeader,
             "auth_prefix": authPrefix,
             "region": region
         ]
+        if let intlURL = apiBaseURLInternational {
+            dict["api_base_url_international"] = intlURL
+        }
         dict["api_key"] = apiKey ?? ""
         UserDefaults.standard.set(dict, forKey: defaultsKey)
     }

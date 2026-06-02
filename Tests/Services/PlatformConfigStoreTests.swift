@@ -50,7 +50,7 @@ final class PlatformConfigStoreTests: XCTestCase {
     }
 
     func testDefaultValues() {
-        let store = PlatformConfigStore(platformType: .minimax)
+        let store = PlatformConfigStore(platformType: .minimax_cn)
         XCTAssertEqual(store.authHeader, "Authorization")
         XCTAssertEqual(store.authPrefix, "Bearer ")
     }
@@ -65,7 +65,7 @@ final class PlatformConfigStoreTests: XCTestCase {
         let deepseek = PlatformConfigStore(platformType: .deepseek)
         deepseek.setAPIKey("sk-deepseek")
 
-        let minimax = PlatformConfigStore(platformType: .minimax)
+        let minimax = PlatformConfigStore(platformType: .minimax_cn)
         minimax.setAPIKey("sk-minimax")
 
         XCTAssertEqual(deepseek.apiKey, "sk-deepseek")

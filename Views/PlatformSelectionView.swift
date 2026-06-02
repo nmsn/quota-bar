@@ -6,7 +6,7 @@ struct PlatformSelectionView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Select Platforms")
+            Text(I18nService.shared.translate("popover.selectPlatforms"))
                 .font(.headline)
                 .padding(.bottom, 8)
 
@@ -35,7 +35,7 @@ struct PlatformSelectionView: View {
             }
 
             if PlatformType.allCases.allSatisfy({ !$0.isEnabled }) {
-                Text("At least one platform required")
+                Text(I18nService.shared.translate("popover.atLeastOnePlatform"))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
