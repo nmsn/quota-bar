@@ -35,8 +35,8 @@ targets:
       base:
         PRODUCT_NAME: QuotaBar
         PRODUCT_BUNDLE_IDENTIFIER: com.quota.statusbar
-        MARKETING_VERSION: "2.0.1"
-        CURRENT_PROJECT_VERSION: "2"
+        MARKETING_VERSION: "2.0.2"
+        CURRENT_PROJECT_VERSION: "3"
         INFOPLIST_FILE: App/Info.plist
         GENERATE_INFOPLIST_FILE: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
