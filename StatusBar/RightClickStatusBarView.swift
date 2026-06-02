@@ -69,9 +69,7 @@ class RightClickStatusBarView: NSView {
 
 /// 自绘圆角矩形高亮 overlay, 模拟 macOS 状态栏按钮按压时的视觉反馈
 private final class HighlightOverlayView: NSView {
-    private let cornerRadius: CGFloat = 4
-    private let highlightAlpha: CGFloat = 0.25
-    private let edgeInset: CGFloat = 2
+    private let cornerRadius: CGFloat = 5
 
     override var isFlipped: Bool { true }
     override var isOpaque: Bool { false }
@@ -82,12 +80,19 @@ private final class HighlightOverlayView: NSView {
     }
 
     override func draw(_ dirtyRect: NSRect) {
+        // 适配明暗主题的白色半透明: 暗色模式 alpha 较小 (深色背景上白色更醒目),
+        // 亮色模式 alpha 较大 (浅色背景上需要更多不透明度才有视觉对比)
+        let isDark = effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        let alpha: CGFloat = isDark ? 0.18 : 0.35
+        NSColor.white.withAlphaComponent(alpha).setFill()
+
+        // 铺满整个 slot, 让 highlight 成为一个明显的"容器";
+        // 内容 (text + dot) 在 SwiftUI 内部已自带 padding, 会被自然居中
         let path = NSBezierPath(
-            roundedRect: bounds.insetBy(dx: edgeInset, dy: edgeInset),
+            roundedRect: bounds,
             xRadius: cornerRadius,
             yRadius: cornerRadius
         )
-        NSColor.controlAccentColor.withAlphaComponent(highlightAlpha).setFill()
         path.fill()
     }
 }
