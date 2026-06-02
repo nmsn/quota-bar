@@ -67,10 +67,8 @@ class RightClickStatusBarView: NSView {
     }
 }
 
-/// 自绘圆角矩形高亮 overlay, 模拟 macOS 状态栏按钮按压时的视觉反馈
+/// 自绘 pill / capsule 形状高亮 overlay, 模拟 macOS 状态栏按钮按压时的视觉反馈
 private final class HighlightOverlayView: NSView {
-    private let cornerRadius: CGFloat = 5
-
     override var isFlipped: Bool { true }
     override var isOpaque: Bool { false }
 
@@ -88,10 +86,12 @@ private final class HighlightOverlayView: NSView {
 
         // 铺满整个 slot, 让 highlight 成为一个明显的"容器";
         // 内容 (text + dot) 在 SwiftUI 内部已自带 padding, 会被自然居中
+        // 半径 = min(宽, 高) / 2 → 左右两端是完整的半圆 (pill / capsule 形状)
+        let radius = min(bounds.width, bounds.height) / 2
         let path = NSBezierPath(
             roundedRect: bounds,
-            xRadius: cornerRadius,
-            yRadius: cornerRadius
+            xRadius: radius,
+            yRadius: radius
         )
         path.fill()
     }
