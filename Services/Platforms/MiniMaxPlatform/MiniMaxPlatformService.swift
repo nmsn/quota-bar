@@ -112,8 +112,8 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
             platform: platform,
             displayName: platform.displayName,
             metrics: [
-                UsageMetric(label: "five_hour", currentValue: dailyRemainingPct, totalValue: 100, unit: "requests", resetTime: dailyResetTime),
-                UsageMetric(label: "weekly_limit", currentValue: weeklyRemainingPct, totalValue: 100, unit: "requests", resetTime: weeklyResetTime)
+                UsageMetric(label: "five_hour", currentValue: dailyRemainingPct, totalValue: 100, unit: "%", resetTime: dailyResetTime),
+                UsageMetric(label: "weekly_limit", currentValue: weeklyRemainingPct, totalValue: 100, unit: "%", resetTime: weeklyResetTime)
             ],
             lastUpdated: Date(),
             isHealthy: isHealthy

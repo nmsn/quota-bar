@@ -77,12 +77,13 @@ Return `SubscriptionQuota` with tiered usage data (5-hour window, weekly limit).
 {
   "base_resp": { "status_code": 0, "status_msg": "success" },
   "model_remains": [{
-    "current_interval_total_count": 1000,
-    "current_interval_usage_count": 200,
+    "model_name": "general",
+    "current_interval_remaining_percent": 72.5,
+    "current_weekly_remaining_percent": 85.0,
     "end_time": 174...,
-    "current_weekly_total_count": 5000,
-    "current_weekly_usage_count": 1000,
-    "weekly_end_time": 174...
+    "weekly_end_time": 174...,
+    "remains_time": 3600000,
+    "weekly_remains_time": 86400000
   }]
 }
 ```

@@ -120,7 +120,10 @@ struct PopoverContentView: View {
                 .font(.caption.bold())
 
             HStack {
-                if let total = metric.totalValue, total > 0 {
+                if metric.unit == "%" {
+                    Text("\(I18nService.shared.translate("popover.remaining")): \(Int(metric.currentValue))%")
+                        .font(.caption)
+                } else if let total = metric.totalValue, total > 0 {
                     Text("\(I18nService.shared.translate("popover.remaining")): \(Int(metric.currentValue))/\(Int(total)) \(metric.unit)")
                         .font(.caption)
                 } else {
