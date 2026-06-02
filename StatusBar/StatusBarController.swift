@@ -181,9 +181,24 @@ class StatusBarController {
         rootMenu.addItem(languageItem)
         rootMenu.addItem(NSMenuItem.separator())
 
-        let checkUpdateItem = NSMenuItem(title: I18nService.shared.translate("menu.checkUpdate"), action: #selector(checkUpdateAction), keyEquivalent: "")
+        let checkUpdateItem = NSMenuItem(
+            title: titleForUpdateState(),
+            action: #selector(checkUpdateAction),
+            keyEquivalent: "u"
+        )
+        checkUpdateItem.keyEquivalentModifierMask = .command
         checkUpdateItem.target = self
+        checkUpdateItem.isEnabled = UpdateService.shared.canCheckForUpdates
+        checkUpdateItem.toolTip = tooltipForUpdateState()
         rootMenu.addItem(checkUpdateItem)
+
+        let openReleasesItem = NSMenuItem(
+            title: I18nService.shared.translate("update.openReleases"),
+            action: #selector(openReleasesAction),
+            keyEquivalent: ""
+        )
+        openReleasesItem.target = self
+        rootMenu.addItem(openReleasesItem)
 
         rootMenu.addItem(NSMenuItem.separator())
 
@@ -246,6 +261,36 @@ class StatusBarController {
 
     @objc private func checkUpdateAction() {
         UpdateService.shared.checkForUpdates()
+    }
+
+    @objc private func openReleasesAction() {
+        UpdateService.shared.openReleasesPage()
+    }
+
+    /// 根据 UpdateService.State 返回菜单项 title, 状态文案优先, idle 状态用通用文案
+    private func titleForUpdateState() -> String {
+        let key: String
+        switch UpdateService.shared.state {
+        case .idle:
+            return I18nService.shared.translate("menu.checkUpdate")
+        case .checking:
+            key = "update.checking"
+        case .upToDate:
+            key = "update.upToDate"
+        case .updateAvailable:
+            key = "update.updateAvailable"
+        case .failed:
+            key = "update.checkFailed"
+        }
+        return I18nService.shared.translate(key)
+    }
+
+    /// "Last checked: 2 hours ago" — i18n 模板 + Date.formatted relative 渲染
+    private func tooltipForUpdateState() -> String? {
+        guard let date = UpdateService.shared.lastCheckDate else { return nil }
+        let template = I18nService.shared.translate("update.lastChecked")
+        let relative = date.formatted(.relative(presentation: .named))
+        return String(format: template, relative)
     }
 
     @objc private func quitAction() {
