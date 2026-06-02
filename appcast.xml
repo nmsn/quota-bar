@@ -4,6 +4,11 @@
     <title>QuotaBar Updates</title>
     <link>https://nmsn.github.io/quota-bar/appcast.xml</link>
     <item>
+      <title>Version 2.0.1</title>
+      <pubDate>Tue, 02 Jun 2026 16:13:17 +0800</pubDate>
+      <enclosure url="https://github.com/nmsn/quota-bar/releases/download/v2.0.1/QuotaBar-2.0.1.dmg" sparkle:version="2.0.1" length="1745490" type="application/octet-stream"/>
+    </item>
+    <item>
       <title>Version 2.0.0</title>
       <pubDate>Sun, 25 May 2026 09:50:00 +0800</pubDate>
       <enclosure url="https://github.com/nmsn/quota-bar/releases/download/v2.0.0/QuotaBar.dmg" sparkle:version="2.0.0" length="1587279" type="application/octet-stream"/>
