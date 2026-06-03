@@ -20,7 +20,7 @@ struct PlatformSelectionView: View {
                                 if newValue {
                                     viewModel.switchActivePlatform(platform)
                                 }
-                                viewModel.fetchAllUsage()
+                                Task { await viewModel.fetchAllUsage() }
                             }
                         )) {
                             HStack {
