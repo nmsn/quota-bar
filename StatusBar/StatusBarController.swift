@@ -181,6 +181,16 @@ class StatusBarController {
         rootMenu.addItem(languageItem)
         rootMenu.addItem(NSMenuItem.separator())
 
+        let aboutItem = NSMenuItem(
+            title: I18nService.shared.translate("menu.about"),
+            action: #selector(showAbout),
+            keyEquivalent: ""
+        )
+        aboutItem.target = self
+        rootMenu.addItem(aboutItem)
+
+        rootMenu.addItem(NSMenuItem.separator())
+
         let checkUpdateItem = NSMenuItem(
             title: titleForUpdateState(),
             action: #selector(checkUpdateAction),
@@ -265,6 +275,25 @@ class StatusBarController {
 
     @objc private func openReleasesAction() {
         UpdateService.shared.openReleasesPage()
+    }
+
+    @objc private func showAbout() {
+        let alert = NSAlert()
+        alert.messageText = "QuotaBar"
+        alert.informativeText = String(
+            format: I18nService.shared.translate("menu.about.version"),
+            AppVersion.marketingVersion,
+            Calendar.current.component(.year, from: Date())
+        )
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: I18nService.shared.translate("menu.about.ok"))
+        alert.addButton(withTitle: I18nService.shared.translate("menu.about.openReleases"))
+        alert.icon = NSImage(named: NSImage.applicationIconName)
+
+        let response = alert.runModal()
+        if response == .alertSecondButtonReturn {
+            UpdateService.shared.openReleasesPage()
+        }
     }
 
     /// 根据 UpdateService.State 返回菜单项 title, 状态文案优先, idle 状态用通用文案
