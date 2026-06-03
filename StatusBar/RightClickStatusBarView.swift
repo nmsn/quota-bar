@@ -38,6 +38,15 @@ class RightClickStatusBarView: NSView {
             highlightView.topAnchor.constraint(equalTo: topAnchor),
             highlightView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+
+        // 添加 tracking area 以捕获 mouseEntered/mouseExited 事件
+        let trackingArea = NSTrackingArea(
+            rect: bounds,
+            options: [.activeAlways, .mouseEnteredAndExited, .inVisibleRect],
+            owner: self,
+            userInfo: nil
+        )
+        addTrackingArea(trackingArea)
     }
 
     func update(rootView: StatusBarView) {
@@ -64,6 +73,21 @@ class RightClickStatusBarView: NSView {
 
     override func rightMouseUp(with event: NSEvent) {
         highlightView.isHidden = true
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        // No-op: hover 不改变高亮状态
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        highlightView.isHidden = true
+    }
+
+    override func mouseDragged(with event: NSEvent) {
+        // 鼠标拖动超出 view 边界时隐藏高亮
+        if !bounds.contains(convert(event.locationInWindow, from: nil)) {
+            highlightView.isHidden = true
+        }
     }
 }
 
