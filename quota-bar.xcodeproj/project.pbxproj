@@ -32,6 +32,7 @@
 		7B9F7A49A96A20BA430E9F71 /* minimax.template.json in Resources */ = {isa = PBXBuildFile; fileRef = 5E09575915041C8761C950A8 /* minimax.template.json */; };
 		85765DCDD271D5DAE8D0B153 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93960D7EC9A64DB2D93E0B51 /* Assets.xcassets */; };
 		88E97DF0F0466EAF0A6E21F6 /* DeepSeekPlatformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9BA2A18F8546FC2205290F /* DeepSeekPlatformTests.swift */; };
+		91AEBA96283F1C42901240C6 /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72170EB2958C232A5B7EAD7D /* AppVersion.swift */; };
 		96D5806936DF98E266F18B36 /* PlatformSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E90CE4A6F3ED54CCE03D6A9 /* PlatformSelectionView.swift */; };
 		99C25D75BF42011F4B651B43 /* screenshot-menu-bar.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B17DC33D3E4A48B299CB251 /* screenshot-menu-bar.png */; };
 		A54197360F6E7417B40672CF /* PopoverContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A41D4381294E4387649612 /* PopoverContentView.swift */; };
@@ -80,6 +81,7 @@
 		6421AA3B46B6ABC036E35B08 /* MockNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNetworkService.swift; sourceTree = "<group>"; };
 		715D8C3273D5B13081D97EA8 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
 		71E2625E187DFF2C5625BA7D /* GLMPlatformService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMPlatformService.swift; sourceTree = "<group>"; };
+		72170EB2958C232A5B7EAD7D /* AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
 		7530C3B7D8FD856FE0584F92 /* zh-Hans.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "zh-Hans.json"; sourceTree = "<group>"; };
 		77C629DB9C5820738FE18AC3 /* kimi.template.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = kimi.template.json; sourceTree = "<group>"; };
 		7B63EF1839A44BB7F0BFBBE1 /* RefreshIntervalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshIntervalTests.swift; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 			isa = PBXGroup;
 			children = (
 				88AB05E0365F937DAD7E4B42 /* AppDelegate.swift */,
+				72170EB2958C232A5B7EAD7D /* AppVersion.swift */,
 				457147EC3F63B62DB01A8FA3 /* Info.plist */,
 				38DA4A0A0CBD196B6B81E382 /* main.swift */,
 			);
@@ -437,6 +440,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EE6A19954AB691C7A19299DD /* AppDelegate.swift in Sources */,
+				91AEBA96283F1C42901240C6 /* AppVersion.swift in Sources */,
 				287A3C1B86EE20DE372057D9 /* ConfigService.swift in Sources */,
 				5008833BE4D8082D7B4C5002 /* DeepSeekPlatformService.swift in Sources */,
 				103E40DB1758C79D15F47295 /* GLMPlatformService.swift in Sources */,
@@ -636,14 +640,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quota.statusbar;
 				PRODUCT_NAME = QuotaBar;
 				SDKROOT = macosx;
@@ -656,14 +660,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quota.statusbar;
 				PRODUCT_NAME = QuotaBar;
 				SDKROOT = macosx;
