@@ -305,7 +305,7 @@ struct PopoverContentView: View {
             } else {
                 if viewModel.isConfigured(viewModel.activePlatform) {
                     Button(action: {
-                        viewModel.fetchAllUsage()
+                        Task { await viewModel.fetchAllUsage() }
                     }) {
                         Image(systemName: "arrow.clockwise")
                     }

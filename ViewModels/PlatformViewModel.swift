@@ -88,7 +88,7 @@ final class PlatformViewModel: ObservableObject {
 
     // MARK: - Fetch
 
-    func fetchAllUsage() {
+    func fetchAllUsage() async {
         fetchTask?.cancel()
         fetchTask = Task {
             let results = await platformManager.fetchAllUsage()
