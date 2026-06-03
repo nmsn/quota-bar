@@ -91,28 +91,23 @@ xcodebuild -project minimax-bar.xcodeproj \
 
 构建产物位于:
 ```
-~/Library/Developer/Xcode/DerivedData/minimax-bar-*/Build/Products/Release/MiniMaxBar.app
+~/Library/Developer/Xcode/DerivedData/quota-bar-*/Build/Products/Release/QuotaBar.app
 ```
 
 ### 7. 打包 DMG
 
-```bash
-# 找到 Release app 路径
-APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData/minimax-bar-*/Build/Products/Release -name "MiniMaxBar.app" -type d | head -1)
+使用 `create-dmg`（需先安装：`brew install create-dmg`）:
 
-# 创建 DMG
-hdiutil create \
-  -volname MiniMaxBar \
-  -srcfolder "$APP_PATH" \
-  -ov \
-  -format UDZO \
-  -o MiniMaxBar-X.Y.Z.dmg
+```bash
+./scripts/package-dmg.sh
 ```
+
+打包产物位于: `dist/QuotaBar-X.Y.Z.dmg`
 
 ### 8. 上传 DMG 到 Release
 
 ```bash
-gh release upload vX.Y.Z MiniMaxBar-X.Y.Z.dmg --clobber
+gh release upload vX.Y.Z QuotaBar-X.Y.Z.dmg --clobber
 ```
 
 ### 9. 验证 Release
@@ -146,8 +141,8 @@ gh release view vX.Y.Z --json assets --jq '.assets'
 Xcode build 产物在 DerivedData 中，使用完整路径：
 
 ```bash
-APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData/minimax-bar-*/Build/Products/Release -name "MiniMaxBar.app" -type d | head -1)
-hdiutil create -volname MiniMaxBar -srcfolder "$APP_PATH" -ov -format UDZO -o MiniMaxBar-X.Y.Z.dmg
+APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData/minimax-bar-*/Build/Products/Release -name "QuotaBar.app" -type d | head -1)
+hdiutil create -volname QuotaBar -srcfolder "$APP_PATH" -ov -format UDZO -o QuotaBar-X.Y.Z.dmg
 ```
 
 ### Q: 是否需要签名？
@@ -155,7 +150,7 @@ hdiutil create -volname MiniMaxBar -srcfolder "$APP_PATH" -ov -format UDZO -o Mi
 本地测试不需要签名。正式分发建议使用 Developer ID 签名：
 
 ```bash
-codesign --force --sign "Developer ID Application: YOUR_NAME" --deep MiniMaxBar-X.Y.Z.dmg
+codesign --force --sign "Developer ID Application: YOUR_NAME" --deep QuotaBar-X.Y.Z.dmg
 ```
 
 ### Q: Sparkle 自动更新配置？

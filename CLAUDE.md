@@ -21,8 +21,9 @@ xcodebuild -project quota-bar.xcodeproj -scheme quota-bar -configuration Release
 # Run tests
 xcodebuild -project quota-bar.xcodeproj -scheme quota-bar -destination 'platform=macOS' test
 
-# Package as DMG
-hdiutil create -volname QuotaBar -srcfolder build/Release/QuotaBar.app -ov -format UDZO -o QuotaBar.dmg
+# Package DMG (requires create-dmg)
+brew install create-dmg
+./scripts/package-dmg.sh
 ```
 
 ## Architecture
