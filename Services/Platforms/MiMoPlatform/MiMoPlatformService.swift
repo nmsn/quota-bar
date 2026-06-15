@@ -70,12 +70,7 @@ final class MiMoPlatformAPIService: PlatformAPIService {
         async let usageRawTask = fetchEndpoint(baseURL + usagePath, config: config, network: network)
         async let detailRawTask = fetchEndpoint(baseURL + detailPath, config: config, network: network)
 
-        let (usageRaw, detailRaw): (Data, Data)
-        do {
-            (usageRaw, detailRaw) = try await (usageRawTask, detailRawTask)
-        } catch {
-            throw error
-        }
+        let (usageRaw, detailRaw) = try await (usageRawTask, detailRawTask)
 
         // 解析 usage
         let usageResponse: MiMoUsageResponse

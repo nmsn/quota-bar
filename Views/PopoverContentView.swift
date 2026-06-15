@@ -424,18 +424,20 @@ struct PopoverContentView: View {
         }
     }
 
-    /// 把大额 Credits 数字格式化成易读的中文 (亿/万).
-    /// 例: 32_851_959_146 → "328.52亿", 5_148_040_854 → "51.48亿", 932 → "932"
+    /// 把大额 Credits 数字格式化成易读的本地化单位.
+    /// 中文: 万/亿; 英文: K/M. (CodeRabbit 指出原写死中文单位, 英文用户看不懂)
+    /// 例 (中文): 32_851_959_146 → "328.52亿", 932 → "932"
+    /// 例 (英文): 32_851_959_146 → "32852.00M"
     private func formatCredits(_ value: Double) -> String {
         let v = Int(value)
-        if v >= 100_000_000 {
-            // 亿: 除以 1e8, 保留两位小数
-            return String(format: "%.2f亿", Double(v) / 1e8)
-        } else if v >= 10_000 {
-            // 万
-            return String(format: "%.2f万", Double(v) / 1e4)
+        let isZh = I18nService.shared.currentLocale == "zh-Hans"
+        if isZh {
+            if v >= 100_000_000 { return String(format: "%.2f亿", Double(v) / 1e8) }
+            if v >= 10_000 { return String(format: "%.2f万", Double(v) / 1e4) }
         } else {
-            return "\(v)"
+            if v >= 1_000_000 { return String(format: "%.2fM", Double(v) / 1e6) }
+            if v >= 1_000 { return String(format: "%.2fK", Double(v) / 1e3) }
         }
+        return "\(v)"
     }
 }

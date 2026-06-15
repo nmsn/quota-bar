@@ -79,7 +79,5 @@
     "platform.minimax_cn": "MiniMax",
     "error.decodingError": "数据解析错误：%@",
     "popover.noData": "无数据",
-    "metric.5h_window": "5小时窗口",
-    "metric.weekly_window": "周限额",
     "popover.staleData": "刷新失败，显示缓存数据"
 }

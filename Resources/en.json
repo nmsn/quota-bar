@@ -79,7 +79,5 @@
     "platform.minimax_cn": "MiniMax",
     "error.decodingError": "Data parsing error: %@",
     "popover.noData": "No Data",
-    "metric.5h_window": "5-Hour Window",
-    "metric.weekly_window": "Weekly Limit",
     "popover.staleData": "Refresh failed — showing cached data"
 }

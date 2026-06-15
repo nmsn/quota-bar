@@ -130,14 +130,10 @@ final class GLMPlatformAPIService: PlatformAPIService {
         }
 
         // 5 小时和周限额有各自的剩余百分比, MCP 月度按次数判断.
-        // 只要任一一项剩余 < 15% 视为偏低.
+        // 只要任一一项剩余 < 15% 视为偏低. (unit=="%" 和次数型逻辑相同, 合并)
         let isHealthy = usageResponse.success && !metrics.isEmpty && metrics.allSatisfy { metric in
-            if metric.unit == "%", let total = metric.totalValue, total > 0 {
-                return metric.currentValue / total * 100 >= 15
-            } else if let total = metric.totalValue, total > 0 {
-                return metric.currentValue / total * 100 >= 15
-            }
-            return true
+            guard let total = metric.totalValue, total > 0 else { return true }
+            return metric.currentValue / total * 100 >= 15
         }
 
         let usageData = PlatformUsageData(

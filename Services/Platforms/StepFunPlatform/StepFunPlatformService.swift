@@ -297,12 +297,7 @@ final class StepFunPlatformAPIService: PlatformAPIService {
         async let rateRaw = postDashboard(rateLimitPath, token: token, network: network)
         async let planRaw = postDashboard(planStatusPath, token: token, network: network)
 
-        let (rateData, planData): (Data, Data)
-        do {
-            (rateData, planData) = try await (rateRaw, planRaw)
-        } catch {
-            throw error
-        }
+        let (rateData, planData) = try await (rateRaw, planRaw)
 
         // 解析用量
         let rateResp: StepFunRateLimitResponse
@@ -330,7 +325,7 @@ final class StepFunPlatformAPIService: PlatformAPIService {
            let fiveReset = rateResp.fiveHourUsageResetTime?.value {
             let remainingPct = max(0, min(100, fiveRate * 100))
             metrics.append(UsageMetric(
-                label: "5h_window",
+                label: "five_hour",
                 currentValue: remainingPct,
                 totalValue: 100,
                 unit: "%",
@@ -342,7 +337,7 @@ final class StepFunPlatformAPIService: PlatformAPIService {
            let weeklyReset = rateResp.weeklyUsageResetTime?.value {
             let remainingPct = max(0, min(100, weeklyRate * 100))
             metrics.append(UsageMetric(
-                label: "weekly_window",
+                label: "weekly_limit",
                 currentValue: remainingPct,
                 totalValue: 100,
                 unit: "%",

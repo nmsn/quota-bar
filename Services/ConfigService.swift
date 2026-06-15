@@ -93,9 +93,17 @@ final class ConfigService {
     }
 
     private func saveGlobalConfig() {
-        UserDefaults.standard.set(cachedDisplayMode.rawValue, forKey: "quotabar.displayMode")
-        UserDefaults.standard.set(cachedActivePlatform.rawValue, forKey: "quotabar.activePlatform")
-        UserDefaults.standard.set(cachedRefreshInterval.rawValue, forKey: "quotabar.refreshInterval")
+        // 加锁读快照再放锁写盘: 避免 setter 放锁后被另一线程插队改 cached,
+        // 导致写到盘上的是混合状态 (CodeRabbit 指出的竞态).
+        configLock.lock()
+        let displayModeRaw = cachedDisplayMode.rawValue
+        let activePlatformRaw = cachedActivePlatform.rawValue
+        let refreshIntervalRaw = cachedRefreshInterval.rawValue
+        configLock.unlock()
+
+        UserDefaults.standard.set(displayModeRaw, forKey: "quotabar.displayMode")
+        UserDefaults.standard.set(activePlatformRaw, forKey: "quotabar.activePlatform")
+        UserDefaults.standard.set(refreshIntervalRaw, forKey: "quotabar.refreshInterval")
     }
 
     /// 清理已从 PlatformType 删除的平台的残留 UserDefaults 配置 (minimax_en / glm_en / kimi).
