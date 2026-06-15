@@ -91,10 +91,16 @@ struct PopoverContentView: View {
 
         if !viewModel.isConfigured(platform) {
             unconfiguredSection(platform)
+        } else if let data = viewModel.platformData[platform] {
+            // 有数据就显示数据 (和状态栏一致). metrics 空 → 无数据; 否则正常显示,
+            // 若同时有刷新错误则附带提示, 让用户知道数值可能不是最新的.
+            if data.metrics.isEmpty {
+                noDataSection
+            } else {
+                metricsSection(data, refreshError: viewModel.platformErrors[platform])
+            }
         } else if let error = viewModel.platformErrors[platform] {
             errorSection(error)
-        } else if let data = viewModel.platformData[platform] {
-            metricsSection(data)
         } else if viewModel.isLoading[platform] == true {
             loadingSection
         } else {
@@ -104,13 +110,28 @@ struct PopoverContentView: View {
 
     // MARK: - Metrics Display
 
-    private func metricsSection(_ data: PlatformUsageData) -> some View {
+    private func metricsSection(_ data: PlatformUsageData, refreshError: PlatformError? = nil) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             ForEach(data.metrics.indices, id: \.self) { index in
                 metricCard(data.metrics[index])
             }
 
             statusSection(data.isHealthy)
+
+            if let refreshError {
+                refreshErrorHint(refreshError)
+            }
+        }
+    }
+
+    // 有数据但最近一次刷新失败时的小提示: 数值仍是旧缓存, 让用户知道可能不是最新.
+    private func refreshErrorHint(_ error: PlatformError) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: "wifi.exclamationmark")
+                .foregroundColor(.orange)
+            Text(I18nService.shared.translate("popover.staleData"))
+                .font(.caption2)
+                .foregroundColor(.secondary)
         }
     }
 
@@ -124,7 +145,7 @@ struct PopoverContentView: View {
                     Text("\(I18nService.shared.translate("popover.remaining")): \(Int(metric.currentValue))%")
                         .font(.caption)
                 } else if let total = metric.totalValue, total > 0 {
-                    Text("\(I18nService.shared.translate("popover.remaining")): \(Int(metric.currentValue))/\(Int(total)) \(metric.unit)")
+                    Text("\(I18nService.shared.translate("popover.remaining")): \(formatCredits(metric.currentValue))/\(formatCredits(total)) \(metric.unit)")
                         .font(.caption)
                 } else {
                     Text("\(metric.currentValue, specifier: "%.2f") \(metric.unit)")
@@ -148,6 +169,9 @@ struct PopoverContentView: View {
         switch metric.label {
         case "five_hour": return "clock"
         case "weekly_limit": return "calendar"
+        case "mcp_monthly": return "wrench.and.screwdriver"  // MCP 月度调用次数
+        case "monthly_usage": return "calendar.badge.clock"  // MiMo 本月用量
+        case "compensation_quota": return "gift"  // MiMo 补偿额度
         default: return "dollarsign.circle"  // 货币余额 (DeepSeek CNY/USD 等)
         }
     }
@@ -156,6 +180,9 @@ struct PopoverContentView: View {
         switch metric.label {
         case "five_hour": return .orange
         case "weekly_limit": return .blue
+        case "mcp_monthly": return .purple  // MCP 月度
+        case "monthly_usage": return .teal  // MiMo 本月用量
+        case "compensation_quota": return .indigo  // MiMo 补偿额度
         default: return .green  // 货币余额
         }
     }
@@ -192,15 +219,20 @@ struct PopoverContentView: View {
             Text(String(format: I18nService.shared.translate("popover.configurePlatform"), viewModel.configPlatform?.displayName ?? ""))
                 .font(.subheadline.bold())
 
-            HStack(spacing: 8) {
-                PasteableTextField(text: $viewModel.apiKeyInput, placeholder: I18nService.shared.translate("popover.inputPlaceholder"), isSecure: !viewModel.showingAPIKey)
-                    .frame(height: 60)
+            // StepFun 用账号密码登录, 其他平台用 API Key
+            if viewModel.configPlatform == .stepfun {
+                stepfunCredentialFields
+            } else {
+                HStack(spacing: 8) {
+                    PasteableTextField(text: $viewModel.apiKeyInput, placeholder: I18nService.shared.translate("popover.inputPlaceholder"), isSecure: !viewModel.showingAPIKey)
+                        .frame(height: 60)
 
-                Button(action: { viewModel.showingAPIKey.toggle() }) {
-                    Image(systemName: viewModel.showingAPIKey ? "eye.slash" : "eye")
-                        .foregroundColor(.secondary)
+                    Button(action: { viewModel.showingAPIKey.toggle() }) {
+                        Image(systemName: viewModel.showingAPIKey ? "eye.slash" : "eye")
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
 
             HStack {
@@ -213,7 +245,7 @@ struct PopoverContentView: View {
                     Image(systemName: "checkmark")
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(viewModel.apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(!configSaveButtonEnabled)
             }
         }
         .padding()
@@ -221,17 +253,49 @@ struct PopoverContentView: View {
         .cornerRadius(8)
     }
 
-    private var regionPicker: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(I18nService.shared.translate("config.region"))
-                .font(.caption.bold())
-            Picker("", selection: $viewModel.regionInput) {
-                Text(I18nService.shared.translate("config.regionDomestic")).tag("domestic")
-                Text(I18nService.shared.translate("config.regionInternational")).tag("international")
+    // StepFun 账号密码输入: 手机号 + 密码 两个独立输入框
+    private var stepfunCredentialFields: some View {
+        VStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(I18nService.shared.translate("popover.stepfunUsername"))
+                    .font(.caption.bold())
+                    .foregroundColor(.secondary)
+                PasteableTextField(text: $viewModel.usernameInput, placeholder: I18nService.shared.translate("popover.stepfunUsernamePlaceholder"), isSecure: false)
+                    .frame(height: 36)
             }
-            .pickerStyle(.segmented)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(I18nService.shared.translate("popover.stepfunPassword"))
+                    .font(.caption.bold())
+                    .foregroundColor(.secondary)
+                HStack(spacing: 8) {
+                    PasteableTextField(text: $viewModel.passwordInput, placeholder: I18nService.shared.translate("popover.stepfunPasswordPlaceholder"), isSecure: !viewModel.showingAPIKey)
+                        .frame(height: 36)
+                    Button(action: { viewModel.showingAPIKey.toggle() }) {
+                        Image(systemName: viewModel.showingAPIKey ? "eye.slash" : "eye")
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            Text(I18nService.shared.translate("popover.stepfunHint"))
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
+
+    // 保存按钮是否可用: StepFun 需要账号密码都填, 其他平台填了 API Key 即可
+    private var configSaveButtonEnabled: Bool {
+        guard let platform = viewModel.configPlatform else { return false }
+        if platform == .stepfun {
+            return !viewModel.usernameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+                   !viewModel.passwordInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        return !viewModel.apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
 
     // MARK: - Unconfigured Section
 
@@ -293,6 +357,23 @@ struct PopoverContentView: View {
         .cornerRadius(8)
     }
 
+    // 已配置但解析出的 metrics 为空 (API 结构变化/字段缺失): 灰色"无数据",
+    // 区别于"额度告急"的红色, 避免误导用户.
+    private var noDataSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Label(I18nService.shared.translate("popover.noData"), systemImage: "questionmark.circle")
+                .font(.subheadline.bold())
+                .foregroundColor(.secondary)
+            Text(I18nService.shared.translate("error.invalidResponse"))
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(8)
+    }
+
     // MARK: - Footer
 
     private var footerSection: some View {
@@ -340,6 +421,21 @@ struct PopoverContentView: View {
             return String(format: I18nService.shared.translate("daily.reset.remaining"), hours, minutes)
         } else {
             return String(format: I18nService.shared.translate("daily.reset.minutesonly"), minutes)
+        }
+    }
+
+    /// 把大额 Credits 数字格式化成易读的中文 (亿/万).
+    /// 例: 32_851_959_146 → "328.52亿", 5_148_040_854 → "51.48亿", 932 → "932"
+    private func formatCredits(_ value: Double) -> String {
+        let v = Int(value)
+        if v >= 100_000_000 {
+            // 亿: 除以 1e8, 保留两位小数
+            return String(format: "%.2f亿", Double(v) / 1e8)
+        } else if v >= 10_000 {
+            // 万
+            return String(format: "%.2f万", Double(v) / 1e4)
+        } else {
+            return "\(v)"
         }
     }
 }

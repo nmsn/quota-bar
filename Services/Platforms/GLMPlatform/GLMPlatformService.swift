@@ -1,11 +1,17 @@
 import Foundation
 
+// 智谱 quota/limit 接口返回的单条限额信息.
+// type 区分大类别: TOKENS_LIMIT = Token 额度(再按 unit 区分 5小时/周),
+//                  TIME_LIMIT = MCP 月度调用次数额度.
+// unit 仅对 TOKENS_LIMIT 有意义: 3 = 5小时窗口, 6 = 每周.
 struct GLMLimitInfo: Codable {
     let type: String
-    let percentage: Int?
-    let usage: Int?
-    let currentValue: Int?
-    let remaining: Int?
+    let unit: Int?          // Token 额度的窗口单位: 3=5小时, 6=每周
+    let percentage: Int?    // 已用百分比 (0-100)
+    let usage: Int?         // 总额度 (TIME_LIMIT 的总次数, 如 1000)
+    let currentValue: Int?  // 已用次数 (TIME_LIMIT 用)
+    let remaining: Int?     // 剩余次数 (TIME_LIMIT 用)
+    let nextResetTime: Int64?  // 重置时间, 毫秒时间戳
 }
 
 struct GLMUsageResponse: Codable {
@@ -24,7 +30,7 @@ final class GLMPlatformAPIService: PlatformAPIService {
     let platformType: PlatformType = .glm_cn
 
     private let cacheTimeout: TimeInterval = 10
-    private var cache: (data: PlatformUsageData, timestamp: Date)?
+    private let cache = PlatformUsageCache<PlatformUsageData>()
 
     private func apiBaseURL(for config: PlatformConfigData) -> String {
         let region = config.region ?? "domestic"
@@ -35,8 +41,8 @@ final class GLMPlatformAPIService: PlatformAPIService {
     }
 
     func fetchUsage(config: PlatformConfigData, network: NetworkService) async throws -> PlatformUsageData {
-        if let cached = cache, Date().timeIntervalSince(cached.timestamp) < cacheTimeout {
-            return cached.data
+        if let cached = cache.read(timeout: cacheTimeout) {
+            return cached
         }
 
         guard !config.apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -80,31 +86,59 @@ final class GLMPlatformAPIService: PlatformAPIService {
             throw PlatformError.decodingError(config.platformType, error.localizedDescription)
         }
 
+        // 业务码错误 (key 失效 / 账户异常): success=false 时透出 msg,
+        // 不要静默走空 metrics 让用户看到"无数据/红"却不知原因.
+        if !usageResponse.success {
+            let msg = usageResponse.msg.isEmpty ? "GLM request failed" : usageResponse.msg
+            throw PlatformError.apiError(config.platformType, msg)
+        }
+
         var metrics: [UsageMetric] = []
 
         if let limits = usageResponse.data?.limits {
             for limit in limits {
-                if limit.type == "TIME_LIMIT", let remaining = limit.remaining, let usage = limit.usage {
+                if limit.type == "TOKENS_LIMIT" {
+                    // Token 额度, 按 unit 区分窗口: 3 = 5小时, 6 = 每周.
+                    // 已用百分比 percentage → 剩余 = 100 - percentage.
+                    let usedPct = limit.percentage ?? 0
+                    let remainingPct = max(0, 100 - usedPct)
+                    let label = (limit.unit == 6) ? "weekly_limit" : "five_hour"
+                    let resetTime = resetDate(from: limit.nextResetTime)
                     metrics.append(UsageMetric(
-                        label: "five_hour",
-                        currentValue: Double(remaining),
-                        totalValue: Double(usage),
-                        unit: "times",
-                        resetTime: nil
-                    ))
-                } else if limit.type == "TOKENS_LIMIT", let percentage = limit.percentage {
-                    metrics.append(UsageMetric(
-                        label: "weekly_limit",
-                        currentValue: Double(100 - percentage),
+                        label: label,
+                        currentValue: Double(remainingPct),
                         totalValue: 100,
                         unit: "%",
-                        resetTime: nil
+                        resetTime: resetTime
+                    ))
+                } else if limit.type == "TIME_LIMIT" {
+                    // TIME_LIMIT = MCP 月度调用次数额度.
+                    // 按次数显示: 剩余/总次数 (如 932/1000 次).
+                    // percentage 是已用百分比, 用它判断是否健康.
+                    let remaining = limit.remaining ?? 0
+                    let total = limit.usage ?? 0
+                    let resetTime = resetDate(from: limit.nextResetTime)
+                    metrics.append(UsageMetric(
+                        label: "mcp_monthly",
+                        currentValue: Double(remaining),
+                        totalValue: Double(total),
+                        unit: "times",
+                        resetTime: resetTime
                     ))
                 }
             }
         }
 
-        let isHealthy = usageResponse.success && !metrics.isEmpty
+        // 5 小时和周限额有各自的剩余百分比, MCP 月度按次数判断.
+        // 只要任一一项剩余 < 15% 视为偏低.
+        let isHealthy = usageResponse.success && !metrics.isEmpty && metrics.allSatisfy { metric in
+            if metric.unit == "%", let total = metric.totalValue, total > 0 {
+                return metric.currentValue / total * 100 >= 15
+            } else if let total = metric.totalValue, total > 0 {
+                return metric.currentValue / total * 100 >= 15
+            }
+            return true
+        }
 
         let usageData = PlatformUsageData(
             platform: config.platformType,
@@ -114,11 +148,18 @@ final class GLMPlatformAPIService: PlatformAPIService {
             isHealthy: isHealthy
         )
 
-        cache = (usageData, Date())
+        cache.write(usageData)
         return usageData
     }
 
     func clearCache() {
-        cache = nil
+        cache.clear()
+    }
+
+    // 智谱接口的 nextResetTime 是毫秒级时间戳, 转成 Date 给 UI 显示倒计时.
+    // 无效或缺失时返回 nil.
+    private func resetDate(from ms: Int64?) -> Date? {
+        guard let ms, ms > 0 else { return nil }
+        return Date(timeIntervalSince1970: TimeInterval(ms) / 1000.0)
     }
 }

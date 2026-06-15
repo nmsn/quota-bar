@@ -4,105 +4,60 @@ struct StatusBarView: View {
     let platformData: PlatformUsageData?
     var displayMode: DisplayMode = .used
 
-    // Legacy support
-    let usageData: UsageData?
-
     init(platformData: PlatformUsageData?, displayMode: DisplayMode = .used) {
         self.platformData = platformData
-        self.displayMode = displayMode
-        self.usageData = nil
-    }
-
-    // Legacy init
-    init(usageData: UsageData?, displayMode: DisplayMode = .used) {
-        self.platformData = nil
-        self.usageData = usageData
         self.displayMode = displayMode
     }
 
     private var primaryPercent: String {
-        if let data = platformData, let metric = data.metrics.first {
-            if let total = metric.totalValue, total > 0 {
-                let percentage: Double
-                switch displayMode {
-                case .remaining:
-                    percentage = metric.currentValue / total
-                case .used:
-                    percentage = (total - metric.currentValue) / total
-                }
-                return "\(Int(percentage * 100))%"
-            } else {
-                // Balance display (no total value = likely currency balance)
-                return formatBalance(metric.currentValue, unit: nil)
+        guard let data = platformData, let metric = data.metrics.first else { return "--" }
+        if let total = metric.totalValue, total > 0 {
+            let percentage: Double
+            switch displayMode {
+            case .remaining:
+                percentage = metric.currentValue / total
+            case .used:
+                percentage = (total - metric.currentValue) / total
             }
+            return "\(Int(percentage * 100))%"
+        } else {
+            // Balance display (no total value = likely currency balance)
+            return formatBalance(metric.currentValue, unit: nil)
         }
-
-        // Legacy fallback
-        guard let data = usageData else { return "--" }
-        let percentage: Double
-        switch displayMode {
-        case .used:
-            percentage = data.dailyUsedPercentage
-        case .remaining:
-            percentage = 1.0 - data.dailyUsedPercentage
-        }
-        return "\(Int(percentage * 100))%"
     }
 
     private var secondaryPercent: String? {
-        if let data = platformData, data.metrics.count > 1 {
-            let metric = data.metrics[1]
-            if let total = metric.totalValue, total > 0 {
-                let percentage: Double
-                switch displayMode {
-                case .remaining:
-                    percentage = metric.currentValue / total
-                case .used:
-                    percentage = (total - metric.currentValue) / total
-                }
-                return "\(Int(percentage * 100))%"
-            } else {
-                return formatBalance(metric.currentValue, unit: nil)
+        guard let data = platformData, data.metrics.count > 1 else { return nil }
+        let metric = data.metrics[1]
+        if let total = metric.totalValue, total > 0 {
+            let percentage: Double
+            switch displayMode {
+            case .remaining:
+                percentage = metric.currentValue / total
+            case .used:
+                percentage = (total - metric.currentValue) / total
             }
+            return "\(Int(percentage * 100))%"
+        } else {
+            return formatBalance(metric.currentValue, unit: nil)
         }
-
-        // Legacy fallback
-        guard let data = usageData else { return nil }
-        let percentage: Double
-        switch displayMode {
-        case .used:
-            percentage = data.weeklyUsedPercentage
-        case .remaining:
-            percentage = 1.0 - data.weeklyUsedPercentage
-        }
-        return "\(Int(percentage * 100))%"
     }
 
     private var statusColor: Color {
-        if let data = platformData {
-            if let metric = data.metrics.first, let total = metric.totalValue, total > 0 {
-                let remainingRatio = metric.currentValue / total
-                if remainingRatio < 0.1 {
-                    return .red
-                } else if remainingRatio < 0.5 {
-                    return .yellow
-                } else {
-                    return .green
-                }
+        guard let data = platformData else { return .secondary }
+        // 无 metrics (API 结构变化/字段缺失): 灰色, 不要因 isHealthy 假报红色
+        if data.metrics.isEmpty { return .secondary }
+        if let metric = data.metrics.first, let total = metric.totalValue, total > 0 {
+            let remainingRatio = metric.currentValue / total
+            if remainingRatio < 0.1 {
+                return .red
+            } else if remainingRatio < 0.5 {
+                return .yellow
+            } else {
+                return .green
             }
-            return data.isHealthy ? .green : .red
         }
-
-        // Legacy fallback
-        guard let data = usageData, data.dailyTotal > 0 else { return .green }
-        let remainingRatio = Double(data.dailyRemaining) / Double(data.dailyTotal)
-        if remainingRatio < 0.1 {
-            return .red
-        } else if remainingRatio < 0.5 {
-            return .yellow
-        } else {
-            return .green
-        }
+        return data.isHealthy ? .green : .red
     }
 
     var body: some View {

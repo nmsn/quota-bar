@@ -29,8 +29,9 @@ final class PlatformViewModelTests: XCTestCase {
 
     func testPlatformDisplayName() {
         let viewModel = PlatformViewModel()
-        XCTAssertEqual(viewModel.platformDisplayName(.minimax_cn), "MiniMax (CN)")
+        XCTAssertEqual(viewModel.platformDisplayName(.minimax_cn), "MiniMax")
         XCTAssertEqual(viewModel.platformDisplayName(.deepseek), "DeepSeek")
+        XCTAssertEqual(viewModel.platformDisplayName(.stepfun), "StepFun")
     }
 
     func testConfigureAPIKey() {

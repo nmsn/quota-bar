@@ -28,11 +28,11 @@ final class DeepSeekPlatformAPIService: PlatformAPIService {
     let platformType: PlatformType = .deepseek
 
     private let cacheTimeout: TimeInterval = 10
-    private var cache: (data: PlatformUsageData, timestamp: Date)?
+    private let cache = PlatformUsageCache<PlatformUsageData>()
 
     func fetchUsage(config: PlatformConfigData, network: NetworkService) async throws -> PlatformUsageData {
-        if let cached = cache, Date().timeIntervalSince(cached.timestamp) < cacheTimeout {
-            return cached.data
+        if let cached = cache.read(timeout: cacheTimeout) {
+            return cached
         }
 
         guard !config.apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -99,11 +99,11 @@ final class DeepSeekPlatformAPIService: PlatformAPIService {
             isHealthy: isHealthy
         )
 
-        cache = (usageData, Date())
+        cache.write(usageData)
         return usageData
     }
 
     func clearCache() {
-        cache = nil
+        cache.clear()
     }
 }

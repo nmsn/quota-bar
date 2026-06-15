@@ -3,25 +3,26 @@ import XCTest
 
 final class PlatformProtocolTests: XCTestCase {
     func testPlatformTypeDisplayNames() {
-        XCTAssertEqual(PlatformType.minimax_cn.displayName, "MiniMax (CN)")
-        XCTAssertEqual(PlatformType.minimax_en.displayName, "MiniMax (EN)")
+        XCTAssertEqual(PlatformType.minimax_cn.displayName, "MiniMax")
         XCTAssertEqual(PlatformType.deepseek.displayName, "DeepSeek")
+        XCTAssertEqual(PlatformType.glm_cn.displayName, "GLM")
+        XCTAssertEqual(PlatformType.mimo.displayName, "MiMo")
+        XCTAssertEqual(PlatformType.stepfun.displayName, "StepFun")
     }
 
     func testPlatformTypeAllCases() {
-        XCTAssertEqual(PlatformType.allCases.count, 6)
+        XCTAssertEqual(PlatformType.allCases.count, 5)
         XCTAssertTrue(PlatformType.allCases.contains(.minimax_cn))
-        XCTAssertTrue(PlatformType.allCases.contains(.minimax_en))
         XCTAssertTrue(PlatformType.allCases.contains(.deepseek))
         XCTAssertTrue(PlatformType.allCases.contains(.glm_cn))
-        XCTAssertTrue(PlatformType.allCases.contains(.glm_en))
-        XCTAssertTrue(PlatformType.allCases.contains(.kimi))
+        XCTAssertTrue(PlatformType.allCases.contains(.mimo))
+        XCTAssertTrue(PlatformType.allCases.contains(.stepfun))
     }
 
     func testPlatformTypeRawValues() {
         XCTAssertEqual(PlatformType.minimax_cn.rawValue, "minimax_cn")
-        XCTAssertEqual(PlatformType.minimax_en.rawValue, "minimax_en")
         XCTAssertEqual(PlatformType.deepseek.rawValue, "deepseek")
+        XCTAssertEqual(PlatformType.stepfun.rawValue, "stepfun")
     }
 
     func testPlatformUsageDataEquality() {

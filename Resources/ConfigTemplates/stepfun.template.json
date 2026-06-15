@@ -1,0 +1,6 @@
+{
+  "api_base_url": "https://platform.stepfun.com",
+  "auth_header": "Cookie",
+  "auth_prefix": "",
+  "api_key": ""
+}

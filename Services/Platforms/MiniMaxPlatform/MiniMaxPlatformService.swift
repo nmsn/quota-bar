@@ -4,11 +4,11 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
     let platformType: PlatformType = .minimax_cn
 
     private let cacheTimeout: TimeInterval = 10
-    private var cache: (data: PlatformUsageData, timestamp: Date)?
+    private let cache = PlatformUsageCache<PlatformUsageData>()
 
     func fetchUsage(config: PlatformConfigData, network: NetworkService) async throws -> PlatformUsageData {
-        if let cached = cache, Date().timeIntervalSince(cached.timestamp) < cacheTimeout {
-            return cached.data
+        if let cached = cache.read(timeout: cacheTimeout) {
+            return cached
         }
 
         guard !config.apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -74,12 +74,12 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
         let modelData = modelRemains.first(where: { $0.modelName == "general" }) ?? modelRemains[0]
 
         let usageData = parseUsageData(from: modelData, platform: config.platformType)
-        cache = (usageData, Date())
+        cache.write(usageData)
         return usageData
     }
 
     func clearCache() {
-        cache = nil
+        cache.clear()
     }
 
     private func apiBaseURL(for config: PlatformConfigData) -> String {
