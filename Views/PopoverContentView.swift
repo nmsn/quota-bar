@@ -169,6 +169,7 @@ struct PopoverContentView: View {
         switch metric.label {
         case "five_hour": return "clock"
         case "weekly_limit": return "calendar"
+        case "weekly_limit_boosted": return "calendar.badge.plus"  // 加成额度, 带 + 标识
         case "mcp_monthly": return "wrench.and.screwdriver"  // MCP 月度调用次数
         case "monthly_usage": return "calendar.badge.clock"  // MiMo 本月用量
         case "compensation_quota": return "gift"  // MiMo 补偿额度
@@ -180,6 +181,7 @@ struct PopoverContentView: View {
         switch metric.label {
         case "five_hour": return .orange
         case "weekly_limit": return .blue
+        case "weekly_limit_boosted": return .purple  // 加成额度, 紫色区分
         case "mcp_monthly": return .purple  // MCP 月度
         case "monthly_usage": return .teal  // MiMo 本月用量
         case "compensation_quota": return .indigo  // MiMo 补偿额度

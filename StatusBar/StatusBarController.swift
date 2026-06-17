@@ -220,6 +220,11 @@ class StatusBarController {
 
         // Root menu
         let rootMenu = NSMenu()
+        // 立即刷新: 清所有平台缓存(token/usage)重新拉取, 平台偶发卡住时一键自愈.
+        let refreshNowItem = NSMenuItem(title: I18nService.shared.translate("menu.refreshNow"), action: #selector(refreshAllNow), keyEquivalent: "")
+        refreshNowItem.target = self
+        rootMenu.addItem(refreshNowItem)
+        rootMenu.addItem(NSMenuItem.separator())
         rootMenu.addItem(displaySettingsItem)
         rootMenu.addItem(refreshItem)
         rootMenu.addItem(platformItem)
@@ -327,6 +332,15 @@ class StatusBarController {
               let interval = RefreshInterval(rawValue: rawValue) else { return }
         ConfigService.shared.refreshInterval = interval
         viewModel.restartAutoRefresh()
+    }
+
+    // 一键自愈: 清掉所有平台的 token/usage 缓存并立即重新拉取.
+    // 某平台(尤其 StepFun)因 token 过期/网络偶发卡住显示异常时, 右键点这个即可恢复.
+    @objc private func refreshAllNow() {
+        PlatformManager.shared.clearAllCaches()
+        Task { @MainActor [weak self] in
+            await self?.viewModel.fetchAllUsage()
+        }
     }
 
     @objc private func setLanguageEnglish() {

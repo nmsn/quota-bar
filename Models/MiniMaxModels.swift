@@ -31,6 +31,8 @@ struct ModelRemain: Codable {
     let currentWeeklyRemainingPercent: Double?
     /// 周限额是否激活: 1 = 激活, 其它值(包括 nil) = 该 plan 无周限额
     let currentWeeklyStatus: Int?
+    /// 周额度加成 (千分比): 1500 = 150% 加成, 0/nil = 标准 100% 额度
+    let weeklyBoostPermille: Int?
 
     enum CodingKeys: String, CodingKey {
         case modelName = "model_name"
@@ -41,5 +43,6 @@ struct ModelRemain: Codable {
         case currentIntervalRemainingPercent = "current_interval_remaining_percent"
         case currentWeeklyRemainingPercent = "current_weekly_remaining_percent"
         case currentWeeklyStatus = "current_weekly_status"
+        case weeklyBoostPermille = "weekly_boost_permille"
     }
 }
