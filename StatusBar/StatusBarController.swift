@@ -336,10 +336,14 @@ class StatusBarController {
 
     // 一键自愈: 清掉所有平台的 token/usage 缓存并立即重新拉取.
     // 某平台(尤其 StepFun)因 token 过期/网络偶发卡住显示异常时, 右键点这个即可恢复.
+    // 先停定时刷新, 避免定时触发的 fetchAllUsage cancel 掉这次手动拉取 (cancel 后
+    // 结果会被 fetchAllUsage 的 Task.isCancelled 丢弃, 表现为"刷新没反应").
     @objc private func refreshAllNow() {
         PlatformManager.shared.clearAllCaches()
+        viewModel.stopAutoRefresh()
         Task { @MainActor [weak self] in
             await self?.viewModel.fetchAllUsage()
+            self?.viewModel.startAutoRefresh()
         }
     }
 

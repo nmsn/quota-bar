@@ -120,13 +120,19 @@ final class StepFunPlatformAPIService: PlatformAPIService {
         // 登录是 3 步 HTTP (ingress → register → signin), 失败要能重试.
         var token: String? = cachedToken()
         var lastError: Error?
-        for attempt in 0..<2 {
+        // 最多 3 轮, 给登录偶发失败 (网络抖动/服务端波动) 留重试机会.
+        // 之前 login 失败直接 throw, 导致 app 长跑时偶尔失灵, 要等下次定时刷新才恢复.
+        for attempt in 0..<3 {
             if token == nil {
-                // 登录失败 (网络错误/密码错误) 要抛出具体错误, 不能用 try? 吞掉
                 do {
                     token = try await login(username: username, password: password, network: network)
                 } catch {
-                    // 登录失败直接抛出, 让用户看到真正的错误原因
+                    lastError = error
+                    // 最后一次失败才抛出; 中间失败退避 2s 后重试
+                    if attempt < 2 {
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                        continue
+                    }
                     throw error
                 }
             }
