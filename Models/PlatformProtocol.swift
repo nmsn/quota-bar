@@ -2,18 +2,12 @@ import Foundation
 
 enum PlatformType: String, Codable, CaseIterable, Hashable {
     case minimax_cn
-    case deepseek
     case glm_cn
-    case mimo
-    case stepfun
 
     var displayName: String {
         switch self {
         case .minimax_cn: return "MiniMax"
-        case .deepseek: return "DeepSeek"
         case .glm_cn: return "GLM"
-        case .mimo: return "MiMo"
-        case .stepfun: return "StepFun"
         }
     }
 }

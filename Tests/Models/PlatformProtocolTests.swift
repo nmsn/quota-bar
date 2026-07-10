@@ -4,32 +4,25 @@ import XCTest
 final class PlatformProtocolTests: XCTestCase {
     func testPlatformTypeDisplayNames() {
         XCTAssertEqual(PlatformType.minimax_cn.displayName, "MiniMax")
-        XCTAssertEqual(PlatformType.deepseek.displayName, "DeepSeek")
         XCTAssertEqual(PlatformType.glm_cn.displayName, "GLM")
-        XCTAssertEqual(PlatformType.mimo.displayName, "MiMo")
-        XCTAssertEqual(PlatformType.stepfun.displayName, "StepFun")
     }
 
     func testPlatformTypeAllCases() {
-        XCTAssertEqual(PlatformType.allCases.count, 5)
+        XCTAssertEqual(PlatformType.allCases.count, 2)
         XCTAssertTrue(PlatformType.allCases.contains(.minimax_cn))
-        XCTAssertTrue(PlatformType.allCases.contains(.deepseek))
         XCTAssertTrue(PlatformType.allCases.contains(.glm_cn))
-        XCTAssertTrue(PlatformType.allCases.contains(.mimo))
-        XCTAssertTrue(PlatformType.allCases.contains(.stepfun))
     }
 
     func testPlatformTypeRawValues() {
         XCTAssertEqual(PlatformType.minimax_cn.rawValue, "minimax_cn")
-        XCTAssertEqual(PlatformType.deepseek.rawValue, "deepseek")
-        XCTAssertEqual(PlatformType.stepfun.rawValue, "stepfun")
+        XCTAssertEqual(PlatformType.glm_cn.rawValue, "glm_cn")
     }
 
     func testPlatformUsageDataEquality() {
         let metric = UsageMetric(label: "Balance", currentValue: 10, totalValue: nil, unit: "USD", resetTime: nil)
         let date = Date()
-        let data1 = PlatformUsageData(platform: .deepseek, displayName: "DeepSeek", metrics: [metric], lastUpdated: date, isHealthy: true)
-        let data2 = PlatformUsageData(platform: .deepseek, displayName: "DeepSeek", metrics: [metric], lastUpdated: date, isHealthy: true)
+        let data1 = PlatformUsageData(platform: .glm_cn, displayName: "GLM", metrics: [metric], lastUpdated: date, isHealthy: true)
+        let data2 = PlatformUsageData(platform: .glm_cn, displayName: "GLM", metrics: [metric], lastUpdated: date, isHealthy: true)
         XCTAssertEqual(data1, data2)
     }
 
@@ -48,6 +41,6 @@ final class PlatformProtocolTests: XCTestCase {
 
     func testPlatformErrorEquality() {
         XCTAssertEqual(PlatformError.notConfigured(.minimax_cn), PlatformError.notConfigured(.minimax_cn))
-        XCTAssertNotEqual(PlatformError.notConfigured(.minimax_cn), PlatformError.notConfigured(.deepseek))
+        XCTAssertNotEqual(PlatformError.notConfigured(.minimax_cn), PlatformError.notConfigured(.glm_cn))
     }
 }

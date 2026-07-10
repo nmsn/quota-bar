@@ -21,15 +21,15 @@ final class ConfigServiceTests: XCTestCase {
 
     func testStoreForPlatformReturnsSameInstance() {
         let service = ConfigService.shared
-        let store1 = service.store(for: .deepseek)
-        let store2 = service.store(for: .deepseek)
+        let store1 = service.store(for: .glm_cn)
+        let store2 = service.store(for: .glm_cn)
         XCTAssertTrue(store1 === store2)
     }
 
     func testStoreForDifferentPlatformsReturnsDifferentInstances() {
         let service = ConfigService.shared
         let store1 = service.store(for: .minimax_cn)
-        let store2 = service.store(for: .deepseek)
+        let store2 = service.store(for: .glm_cn)
         XCTAssertFalse(store1 === store2)
     }
 }

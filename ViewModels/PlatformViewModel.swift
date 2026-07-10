@@ -25,9 +25,6 @@ final class PlatformViewModel: ObservableObject {
     @Published var apiKeyInput: String = ""
     @Published var regionInput: String = "domestic"
     @Published var showingAPIKey: Bool = false
-    // StepFun 用账号密码登录, 单独的输入状态
-    @Published var usernameInput: String = ""
-    @Published var passwordInput: String = ""
 
     weak var delegate: PlatformViewModelDelegate?
 
@@ -179,17 +176,6 @@ final class PlatformViewModel: ObservableObject {
         apiKeyInput = store.isConfigured ? (store.apiKey ?? "") : ""
         regionInput = store.region
         showingAPIKey = false
-        // StepFun: apiKey 存的是 "手机号\n密码", 拆开填到专用输入框
-        if platform == .stepfun {
-            let parts = (store.apiKey ?? "")
-                .components(separatedBy: CharacterSet.newlines)
-                .map { $0.trimmingCharacters(in: .whitespaces) }
-            usernameInput = parts.first ?? ""
-            passwordInput = parts.count > 1 ? parts[1] : ""
-        } else {
-            usernameInput = ""
-            passwordInput = ""
-        }
         showingConfig = true
     }
 
@@ -197,25 +183,14 @@ final class PlatformViewModel: ObservableObject {
         guard let platform = configPlatform else { return }
         let store = configService.store(for: platform)
 
-        // StepFun: 存 "手机号\n密码" 组合, service 里解析登录
-        if platform == .stepfun {
-            let username = usernameInput.trimmingCharacters(in: .whitespacesAndNewlines)
-            let password = passwordInput.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !username.isEmpty, !password.isEmpty else { return }
-            store.setAPIKey("\(username)\n\(password)")
-            store.setRegion(regionInput)
-        } else {
-            let trimmedKey = apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !trimmedKey.isEmpty else { return }
-            store.setAPIKey(trimmedKey)
-            store.setRegion(regionInput)
-        }
+        let trimmedKey = apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedKey.isEmpty else { return }
+        store.setAPIKey(trimmedKey)
+        store.setRegion(regionInput)
 
         showingConfig = false
         configPlatform = nil
         apiKeyInput = ""
-        usernameInput = ""
-        passwordInput = ""
         regionInput = "domestic"
 
         fetchUsage(for: platform)
@@ -225,8 +200,6 @@ final class PlatformViewModel: ObservableObject {
         showingConfig = false
         configPlatform = nil
         apiKeyInput = ""
-        usernameInput = ""
-        passwordInput = ""
         regionInput = "domestic"
         showingAPIKey = false
     }

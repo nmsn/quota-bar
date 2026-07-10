@@ -30,20 +30,19 @@ final class PlatformViewModelTests: XCTestCase {
     func testPlatformDisplayName() {
         let viewModel = PlatformViewModel()
         XCTAssertEqual(viewModel.platformDisplayName(.minimax_cn), "MiniMax")
-        XCTAssertEqual(viewModel.platformDisplayName(.deepseek), "DeepSeek")
-        XCTAssertEqual(viewModel.platformDisplayName(.stepfun), "StepFun")
+        XCTAssertEqual(viewModel.platformDisplayName(.glm_cn), "GLM")
     }
 
     func testConfigureAPIKey() {
         let viewModel = PlatformViewModel()
-        viewModel.configureAPIKey(for: .deepseek)
+        viewModel.configureAPIKey(for: .glm_cn)
         XCTAssertTrue(viewModel.showingConfig)
-        XCTAssertEqual(viewModel.configPlatform, .deepseek)
+        XCTAssertEqual(viewModel.configPlatform, .glm_cn)
     }
 
     func testCancelConfig() {
         let viewModel = PlatformViewModel()
-        viewModel.configureAPIKey(for: .deepseek)
+        viewModel.configureAPIKey(for: .glm_cn)
         viewModel.cancelConfig()
         XCTAssertFalse(viewModel.showingConfig)
         XCTAssertNil(viewModel.configPlatform)
@@ -57,7 +56,7 @@ final class PlatformViewModelTests: XCTestCase {
 
     func testSwitchActivePlatform() {
         let viewModel = PlatformViewModel()
-        viewModel.switchActivePlatform(.deepseek)
-        XCTAssertEqual(viewModel.activePlatform, .deepseek)
+        viewModel.switchActivePlatform(.glm_cn)
+        XCTAssertEqual(viewModel.activePlatform, .glm_cn)
     }
 }

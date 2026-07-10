@@ -1,6 +1,0 @@
-{
-  "api_base_url": "https://api.deepseek.com",
-  "auth_header": "Authorization",
-  "auth_prefix": "Bearer ",
-  "api_key": ""
-}

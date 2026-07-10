@@ -171,9 +171,7 @@ struct PopoverContentView: View {
         case "weekly_limit": return "calendar"
         case "weekly_limit_boosted": return "calendar.badge.plus"  // 加成额度, 带 + 标识
         case "mcp_monthly": return "wrench.and.screwdriver"  // MCP 月度调用次数
-        case "monthly_usage": return "calendar.badge.clock"  // MiMo 本月用量
-        case "compensation_quota": return "gift"  // MiMo 补偿额度
-        default: return "dollarsign.circle"  // 货币余额 (DeepSeek CNY/USD 等)
+        default: return "dollarsign.circle"  // 货币余额
         }
     }
 
@@ -183,8 +181,6 @@ struct PopoverContentView: View {
         case "weekly_limit": return .blue
         case "weekly_limit_boosted": return .purple  // 加成额度, 紫色区分
         case "mcp_monthly": return .purple  // MCP 月度
-        case "monthly_usage": return .teal  // MiMo 本月用量
-        case "compensation_quota": return .indigo  // MiMo 补偿额度
         default: return .green  // 货币余额
         }
     }
@@ -221,20 +217,15 @@ struct PopoverContentView: View {
             Text(String(format: I18nService.shared.translate("popover.configurePlatform"), viewModel.configPlatform?.displayName ?? ""))
                 .font(.subheadline.bold())
 
-            // StepFun 用账号密码登录, 其他平台用 API Key
-            if viewModel.configPlatform == .stepfun {
-                stepfunCredentialFields
-            } else {
-                HStack(spacing: 8) {
-                    PasteableTextField(text: $viewModel.apiKeyInput, placeholder: I18nService.shared.translate("popover.inputPlaceholder"), isSecure: !viewModel.showingAPIKey)
-                        .frame(height: 60)
+            HStack(spacing: 8) {
+                PasteableTextField(text: $viewModel.apiKeyInput, placeholder: I18nService.shared.translate("popover.inputPlaceholder"), isSecure: !viewModel.showingAPIKey)
+                    .frame(height: 60)
 
-                    Button(action: { viewModel.showingAPIKey.toggle() }) {
-                        Image(systemName: viewModel.showingAPIKey ? "eye.slash" : "eye")
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
+                Button(action: { viewModel.showingAPIKey.toggle() }) {
+                    Image(systemName: viewModel.showingAPIKey ? "eye.slash" : "eye")
+                        .foregroundColor(.secondary)
                 }
+                .buttonStyle(.plain)
             }
 
             HStack {
@@ -255,46 +246,9 @@ struct PopoverContentView: View {
         .cornerRadius(8)
     }
 
-    // StepFun 账号密码输入: 手机号 + 密码 两个独立输入框
-    private var stepfunCredentialFields: some View {
-        VStack(spacing: 8) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(I18nService.shared.translate("popover.stepfunUsername"))
-                    .font(.caption.bold())
-                    .foregroundColor(.secondary)
-                PasteableTextField(text: $viewModel.usernameInput, placeholder: I18nService.shared.translate("popover.stepfunUsernamePlaceholder"), isSecure: false)
-                    .frame(height: 36)
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(I18nService.shared.translate("popover.stepfunPassword"))
-                    .font(.caption.bold())
-                    .foregroundColor(.secondary)
-                HStack(spacing: 8) {
-                    PasteableTextField(text: $viewModel.passwordInput, placeholder: I18nService.shared.translate("popover.stepfunPasswordPlaceholder"), isSecure: !viewModel.showingAPIKey)
-                        .frame(height: 36)
-                    Button(action: { viewModel.showingAPIKey.toggle() }) {
-                        Image(systemName: viewModel.showingAPIKey ? "eye.slash" : "eye")
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-
-            Text(I18nService.shared.translate("popover.stepfunHint"))
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
-    // 保存按钮是否可用: StepFun 需要账号密码都填, 其他平台填了 API Key 即可
+    // 保存按钮是否可用: 填了 API Key 即可
     private var configSaveButtonEnabled: Bool {
-        guard let platform = viewModel.configPlatform else { return false }
-        if platform == .stepfun {
-            return !viewModel.usernameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-                   !viewModel.passwordInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        }
+        guard viewModel.configPlatform != nil else { return false }
         return !viewModel.apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 

@@ -129,6 +129,10 @@ final class GLMPlatformAPIService: PlatformAPIService {
             }
         }
 
+        // 固定排序: 5 小时 → 周限额 → MCP 月度, 保证主要指标始终在前.
+        let order: [String: Int] = ["five_hour": 0, "weekly_limit": 1, "mcp_monthly": 2]
+        metrics.sort { (order[$0.label] ?? 99) < (order[$1.label] ?? 99) }
+
         // 5 小时和周限额有各自的剩余百分比, MCP 月度按次数判断.
         // 只要任一一项剩余 < 15% 视为偏低. (unit=="%" 和次数型逻辑相同, 合并)
         let isHealthy = usageResponse.success && !metrics.isEmpty && metrics.allSatisfy { metric in
