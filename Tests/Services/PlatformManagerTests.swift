@@ -4,7 +4,7 @@ import XCTest
 final class PlatformManagerTests: XCTestCase {
     func testManagerHasDefaultServices() {
         let manager = PlatformManager()
-        // Should have MiniMax and DeepSeek registered
+        // Should have MiniMax and GLM registered
         let configured = manager.configuredPlatforms()
         XCTAssertNotNil(configured)
     }
@@ -22,7 +22,7 @@ final class PlatformManagerTests: XCTestCase {
     func testClearCacheDoesNotCrash() {
         let manager = PlatformManager()
         manager.clearCache(for: .minimax_cn)
-        manager.clearCache(for: .deepseek)
+        manager.clearCache(for: .glm_cn)
         manager.clearAllCaches()
     }
 }

@@ -9,10 +9,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         I18nService.shared.loadTranslations()
 
         viewModel = PlatformViewModel()
-        statusBarController = StatusBarController(viewModel: viewModel!)
+        guard let viewModel else { return }
 
-        viewModel?.delegate = self
-        viewModel?.startAutoRefresh()
+        statusBarController = StatusBarController(viewModel: viewModel)
+        viewModel.delegate = self
+        viewModel.startAutoRefresh()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -23,6 +24,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 extension AppDelegate: PlatformViewModelDelegate {
     func platformViewModel(_ viewModel: PlatformViewModel, didUpdateData data: PlatformUsageData?) {
         statusBarController?.update(data: data)
+    }
+
+    func platformViewModel(_ viewModel: PlatformViewModel, didUpdateAllData allData: [PlatformType: PlatformUsageData]) {
+        statusBarController?.updateAll(data: allData)
     }
 
     func platformViewModel(_ viewModel: PlatformViewModel, didSwitchPlatform platform: PlatformType) {

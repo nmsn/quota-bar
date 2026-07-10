@@ -1,7 +1,0 @@
-{
-  "api_base_url": "https://api.kimi.com/coding/v1/usages",
-  "auth_header": "Authorization",
-  "auth_prefix": "Bearer ",
-  "api_key": "",
-  "region": "domestic"
-}

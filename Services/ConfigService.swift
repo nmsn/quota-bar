@@ -12,33 +12,44 @@ final class ConfigService {
     private var cachedActivePlatform: PlatformType = .minimax_cn
     private var cachedRefreshInterval: RefreshInterval = .default
     private var platformStores: [PlatformType: PlatformConfigStore] = [:]
+    // platformStores 被 fetchAllUsage 的并发任务同时读写, 必须加锁保护字典结构.
+    private let storesLock = NSLock()
+    // cached 全局配置可能在多线程下读写 (UI 主线程 + 切换平台), 加锁保护.
+    private let configLock = NSLock()
 
     private init() {
         loadGlobalConfig()
+        cleanupLegacyPlatformKeys()
     }
 
     // MARK: - Global Config
 
     var displayMode: DisplayMode {
-        get { cachedDisplayMode }
+        get { configLock.lock(); defer { configLock.unlock() }; return cachedDisplayMode }
         set {
+            configLock.lock()
             cachedDisplayMode = newValue
+            configLock.unlock()
             saveGlobalConfig()
         }
     }
 
     var activePlatform: PlatformType {
-        get { cachedActivePlatform }
+        get { configLock.lock(); defer { configLock.unlock() }; return cachedActivePlatform }
         set {
+            configLock.lock()
             cachedActivePlatform = newValue
+            configLock.unlock()
             saveGlobalConfig()
         }
     }
 
     var refreshInterval: RefreshInterval {
-        get { cachedRefreshInterval }
+        get { configLock.lock(); defer { configLock.unlock() }; return cachedRefreshInterval }
         set {
+            configLock.lock()
             cachedRefreshInterval = newValue
+            configLock.unlock()
             saveGlobalConfig()
         }
     }
@@ -46,6 +57,8 @@ final class ConfigService {
     // MARK: - Platform Stores
 
     func store(for platform: PlatformType) -> PlatformConfigStore {
+        storesLock.lock()
+        defer { storesLock.unlock() }
         if let existing = platformStores[platform] {
             return existing
         }
@@ -80,8 +93,27 @@ final class ConfigService {
     }
 
     private func saveGlobalConfig() {
-        UserDefaults.standard.set(cachedDisplayMode.rawValue, forKey: "quotabar.displayMode")
-        UserDefaults.standard.set(cachedActivePlatform.rawValue, forKey: "quotabar.activePlatform")
-        UserDefaults.standard.set(cachedRefreshInterval.rawValue, forKey: "quotabar.refreshInterval")
+        // 加锁读快照再放锁写盘: 避免 setter 放锁后被另一线程插队改 cached,
+        // 导致写到盘上的是混合状态 (CodeRabbit 指出的竞态).
+        configLock.lock()
+        let displayModeRaw = cachedDisplayMode.rawValue
+        let activePlatformRaw = cachedActivePlatform.rawValue
+        let refreshIntervalRaw = cachedRefreshInterval.rawValue
+        configLock.unlock()
+
+        UserDefaults.standard.set(displayModeRaw, forKey: "quotabar.displayMode")
+        UserDefaults.standard.set(activePlatformRaw, forKey: "quotabar.activePlatform")
+        UserDefaults.standard.set(refreshIntervalRaw, forKey: "quotabar.refreshInterval")
+    }
+
+    /// 清理已从 PlatformType 删除的平台的残留 UserDefaults 配置 (minimax_en / glm_en / kimi).
+    /// 这些 key 是历史版本写入的, enum 里已无对应 case, 留着是无害的死数据, 顺手清掉.
+    private func cleanupLegacyPlatformKeys() {
+        for legacy in ["minimax_en", "glm_en", "kimi"] {
+            let prefix = "quotabar.platform.\(legacy)"
+            UserDefaults.standard.removeObject(forKey: prefix)
+            UserDefaults.standard.removeObject(forKey: "\(prefix).enabled")
+            UserDefaults.standard.removeObject(forKey: "\(prefix).pinned")
+        }
     }
 }

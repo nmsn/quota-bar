@@ -17,9 +17,7 @@ final class PlatformManager {
 
         // Register default platform services
         register(MiniMaxPlatformAPIService())
-        register(DeepSeekPlatformAPIService())
         register(GLMPlatformAPIService())
-        register(KimiPlatformAPIService())
     }
 
     func register(_ service: PlatformAPIService) {
@@ -44,6 +42,8 @@ final class PlatformManager {
 
         await withTaskGroup(of: (PlatformType, Result<PlatformUsageData, Error>).self) { group in
             for platform in PlatformType.allCases {
+                // 只请求已启用且已配置的平台 (禁用的平台不浪费请求)
+                guard platform.isEnabled else { continue }
                 let store = configService.store(for: platform)
                 guard store.isConfigured else { continue }
 
@@ -85,11 +85,6 @@ final class PlatformManager {
         // Prevent disabling the last enabled platform
         if !enabled && platform.isEnabled && isLastEnabledPlatform(platform) {
             return
-        }
-
-        // Auto-disable sibling platform (CN/EN mutex)
-        if enabled, let sibling = platform.siblingPlatform, sibling.isEnabled {
-            UserDefaults.standard.set(false, forKey: "quotabar.platform.\(sibling.rawValue).enabled")
         }
 
         UserDefaults.standard.set(enabled, forKey: "quotabar.platform.\(platform.rawValue).enabled")

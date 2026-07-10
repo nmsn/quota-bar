@@ -6,6 +6,12 @@ import Combine
 protocol PlatformViewModelDelegate: AnyObject {
     func platformViewModel(_ viewModel: PlatformViewModel, didUpdateData data: PlatformUsageData?)
     func platformViewModel(_ viewModel: PlatformViewModel, didSwitchPlatform platform: PlatformType)
+    // 全量数据更新 (所有平台). 默认空实现, 向后兼容.
+    func platformViewModel(_ viewModel: PlatformViewModel, didUpdateAllData allData: [PlatformType: PlatformUsageData])
+}
+
+extension PlatformViewModelDelegate {
+    func platformViewModel(_ viewModel: PlatformViewModel, didUpdateAllData allData: [PlatformType: PlatformUsageData]) {}
 }
 
 @MainActor
@@ -38,6 +44,10 @@ final class PlatformViewModel: ObservableObject {
             name: .platformEnabledChanged,
             object: nil
         )
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     // MARK: - Platform Enabled Observer
@@ -91,7 +101,17 @@ final class PlatformViewModel: ObservableObject {
     func fetchAllUsage() async {
         fetchTask?.cancel()
         fetchTask = Task {
+            // 先标记所有已配置平台为加载中
+            for platform in platformManager.configuredPlatforms() {
+                isLoading[platform] = true
+            }
+
             let results = await platformManager.fetchAllUsage()
+
+            // 被新的 fetchAllUsage 取消时丢弃结果, 避免覆盖更新的数据
+            // (PlatformManager 的 TaskGroup 不检查 cancellation, 网络请求会跑完,
+            //  但结果不再写回, 防止定时刷新和手动刷新撞车时旧数据盖新数据)
+            if Task.isCancelled { return }
 
             for (platform, result) in results {
                 switch result {
@@ -108,8 +128,9 @@ final class PlatformViewModel: ObservableObject {
                 isLoading[platform] = false
             }
 
-            // Notify delegate for active platform
+            // Notify delegate for active platform + 全量数据 (钉选多平台状态栏需要)
             delegate?.platformViewModel(self, didUpdateData: platformData[activePlatform])
+            delegate?.platformViewModel(self, didUpdateAllData: platformData)
         }
     }
 
@@ -126,6 +147,7 @@ final class PlatformViewModel: ObservableObject {
                 if platform == activePlatform {
                     delegate?.platformViewModel(self, didUpdateData: data)
                 }
+                delegate?.platformViewModel(self, didUpdateAllData: platformData)
             } catch {
                 if let platformError = error as? PlatformError {
                     platformErrors[platform] = platformError
@@ -159,10 +181,10 @@ final class PlatformViewModel: ObservableObject {
 
     func saveAPIKey() {
         guard let platform = configPlatform else { return }
+        let store = configService.store(for: platform)
+
         let trimmedKey = apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedKey.isEmpty else { return }
-
-        let store = configService.store(for: platform)
         store.setAPIKey(trimmedKey)
         store.setRegion(regionInput)
 

@@ -4,11 +4,11 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
     let platformType: PlatformType = .minimax_cn
 
     private let cacheTimeout: TimeInterval = 10
-    private var cache: (data: PlatformUsageData, timestamp: Date)?
+    private let cache = PlatformUsageCache<PlatformUsageData>()
 
     func fetchUsage(config: PlatformConfigData, network: NetworkService) async throws -> PlatformUsageData {
-        if let cached = cache, Date().timeIntervalSince(cached.timestamp) < cacheTimeout {
-            return cached.data
+        if let cached = cache.read(timeout: cacheTimeout) {
+            return cached
         }
 
         guard !config.apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -74,12 +74,12 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
         let modelData = modelRemains.first(where: { $0.modelName == "general" }) ?? modelRemains[0]
 
         let usageData = parseUsageData(from: modelData, platform: config.platformType)
-        cache = (usageData, Date())
+        cache.write(usageData)
         return usageData
     }
 
     func clearCache() {
-        cache = nil
+        cache.clear()
     }
 
     private func apiBaseURL(for config: PlatformConfigData) -> String {
@@ -126,8 +126,11 @@ final class MiniMaxPlatformAPIService: PlatformAPIService {
         // 周限额仅在 current_weekly_status == 1 时展示. 其它值(包括 nil)表示该 plan
         // 无周限额 — 跟上游 cc-switch 的语义对齐, 避免展示过时的/随机的 weekly 数据.
         if model.currentWeeklyStatus == 1 {
+            // 周额度加成 (weekly_boost_permille > 1000 表示有加成, 如 1500 = 150%):
+            // 区分"标准 100%"和"加成 150%"两种 plan, 用不同 label 让 UI 显示对应类型.
+            let boosted = (model.weeklyBoostPermille ?? 0) > 1000
             metrics.append(
-                UsageMetric(label: "weekly_limit", currentValue: weeklyRemainingPct, totalValue: 100, unit: "%", resetTime: weeklyResetTime)
+                UsageMetric(label: boosted ? "weekly_limit_boosted" : "weekly_limit", currentValue: weeklyRemainingPct, totalValue: 100, unit: "%", resetTime: weeklyResetTime)
             )
         }
 

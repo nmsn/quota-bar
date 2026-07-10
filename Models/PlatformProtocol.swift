@@ -2,30 +2,12 @@ import Foundation
 
 enum PlatformType: String, Codable, CaseIterable, Hashable {
     case minimax_cn
-    case minimax_en
-    case deepseek
     case glm_cn
-    case glm_en
-    case kimi
 
     var displayName: String {
         switch self {
-        case .minimax_cn: return "MiniMax (CN)"
-        case .minimax_en: return "MiniMax (EN)"
-        case .deepseek: return "DeepSeek"
-        case .glm_cn: return "GLM (CN)"
-        case .glm_en: return "GLM (EN)"
-        case .kimi: return "Kimi"
-        }
-    }
-
-    var siblingPlatform: PlatformType? {
-        switch self {
-        case .minimax_cn: return .minimax_en
-        case .minimax_en: return .minimax_cn
-        case .glm_cn: return .glm_en
-        case .glm_en: return .glm_cn
-        default: return nil
+        case .minimax_cn: return "MiniMax"
+        case .glm_cn: return "GLM"
         }
     }
 }
@@ -51,7 +33,7 @@ extension PlatformError: LocalizedError {
         case .unauthorized:
             return I18nService.shared.translate("error.unauthorized")
         case .decodingError(_, let message):
-            return String(format: I18nService.shared.translate("error.networkError"), message)
+            return String(format: I18nService.shared.translate("error.decodingError"), message)
         case .apiError(_, let message):
             return String(format: I18nService.shared.translate("error.apiError"), message)
         }

@@ -11,15 +11,18 @@ final class PlatformConfigStore {
     private(set) var region: String  // "domestic" or "international"
 
     private let defaultsKey: String
+    // 注入 UserDefaults: 生产用 .standard, 测试用独立 suite, 避免测试 fixture 污染真实配置.
+    private let defaults: UserDefaults
 
     var isConfigured: Bool {
         guard let key = apiKey else { return false }
         return !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    init(platformType: PlatformType) {
+    init(platformType: PlatformType, userDefaults: UserDefaults = .standard) {
         self.platformType = platformType
         self.defaultsKey = "quotabar.platform.\(platformType.rawValue)"
+        self.defaults = userDefaults
 
         self.apiBaseURL = ""
         self.apiBaseURLInternational = nil
@@ -61,17 +64,17 @@ final class PlatformConfigStore {
     // MARK: - Private
 
     private func load() {
-        guard let anyValue = UserDefaults.standard.object(forKey: defaultsKey) else { return }
+        guard let anyValue = defaults.object(forKey: defaultsKey) else { return }
         guard var dict = anyValue as? [String: Any] else {
             // Data corruption: stored value is not a dictionary, reset it
-            UserDefaults.standard.removeObject(forKey: defaultsKey)
+            defaults.removeObject(forKey: defaultsKey)
             return
         }
         // Strip NSNull values left by a previous bug and re-save the cleaned dict
         let hasNSNull = dict.values.contains { $0 is NSNull }
         if hasNSNull {
             dict = dict.filter { !($0.value is NSNull) }
-            UserDefaults.standard.set(dict, forKey: defaultsKey)
+            defaults.set(dict, forKey: defaultsKey)
         }
         apiBaseURL = dict["api_base_url"] as? String ?? ""
         apiBaseURLInternational = dict["api_base_url_international"] as? String
@@ -92,18 +95,18 @@ final class PlatformConfigStore {
             dict["api_base_url_international"] = intlURL
         }
         dict["api_key"] = apiKey ?? ""
-        UserDefaults.standard.set(dict, forKey: defaultsKey)
+        defaults.set(dict, forKey: defaultsKey)
     }
 
     private func fillDefaultsFromTemplateIfNeeded() {
         guard apiBaseURL.isEmpty else { return }
 
-        // Template name based on base platform (minimax, glm, etc.)
+        // Template name based on base platform (minimax_cn → minimax, glm_cn → glm, etc.)
         let templatePlatformName: String
         switch platformType {
-        case .minimax_cn, .minimax_en:
+        case .minimax_cn:
             templatePlatformName = "minimax"
-        case .glm_cn, .glm_en:
+        case .glm_cn:
             templatePlatformName = "glm"
         default:
             templatePlatformName = platformType.rawValue
@@ -141,5 +144,17 @@ extension PlatformType {
             return UserDefaults.standard.bool(forKey: "quotabar.platform.\(rawValue).enabled")
         }
         set { UserDefaults.standard.set(newValue, forKey: "quotabar.platform.\(rawValue).enabled") }
+    }
+
+    // 钉选到状态栏: pinned 的平台会常驻状态栏, 各占一块独立显示.
+    var isPinned: Bool {
+        get { UserDefaults.standard.bool(forKey: "quotabar.platform.\(rawValue).pinned") }
+        set { UserDefaults.standard.set(newValue, forKey: "quotabar.platform.\(rawValue).pinned") }
+    }
+
+    // 所有已钉选且已启用的平台, 按 enum 声明顺序.
+    // 禁用的平台即使 isPinned=true 也不会显示 (避免状态不一致).
+    static var allPinned: [PlatformType] {
+        allCases.filter { $0.isPinned && $0.isEnabled }
     }
 }

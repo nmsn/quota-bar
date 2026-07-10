@@ -91,10 +91,16 @@ struct PopoverContentView: View {
 
         if !viewModel.isConfigured(platform) {
             unconfiguredSection(platform)
+        } else if let data = viewModel.platformData[platform] {
+            // 有数据就显示数据 (和状态栏一致). metrics 空 → 无数据; 否则正常显示,
+            // 若同时有刷新错误则附带提示, 让用户知道数值可能不是最新的.
+            if data.metrics.isEmpty {
+                noDataSection
+            } else {
+                metricsSection(data, refreshError: viewModel.platformErrors[platform])
+            }
         } else if let error = viewModel.platformErrors[platform] {
             errorSection(error)
-        } else if let data = viewModel.platformData[platform] {
-            metricsSection(data)
         } else if viewModel.isLoading[platform] == true {
             loadingSection
         } else {
@@ -104,13 +110,28 @@ struct PopoverContentView: View {
 
     // MARK: - Metrics Display
 
-    private func metricsSection(_ data: PlatformUsageData) -> some View {
+    private func metricsSection(_ data: PlatformUsageData, refreshError: PlatformError? = nil) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             ForEach(data.metrics.indices, id: \.self) { index in
                 metricCard(data.metrics[index])
             }
 
             statusSection(data.isHealthy)
+
+            if let refreshError {
+                refreshErrorHint(refreshError)
+            }
+        }
+    }
+
+    // 有数据但最近一次刷新失败时的小提示: 数值仍是旧缓存, 让用户知道可能不是最新.
+    private func refreshErrorHint(_ error: PlatformError) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: "wifi.exclamationmark")
+                .foregroundColor(.orange)
+            Text(I18nService.shared.translate("popover.staleData"))
+                .font(.caption2)
+                .foregroundColor(.secondary)
         }
     }
 
@@ -124,7 +145,7 @@ struct PopoverContentView: View {
                     Text("\(I18nService.shared.translate("popover.remaining")): \(Int(metric.currentValue))%")
                         .font(.caption)
                 } else if let total = metric.totalValue, total > 0 {
-                    Text("\(I18nService.shared.translate("popover.remaining")): \(Int(metric.currentValue))/\(Int(total)) \(metric.unit)")
+                    Text("\(I18nService.shared.translate("popover.remaining")): \(formatCredits(metric.currentValue))/\(formatCredits(total)) \(metric.unit)")
                         .font(.caption)
                 } else {
                     Text("\(metric.currentValue, specifier: "%.2f") \(metric.unit)")
@@ -148,7 +169,9 @@ struct PopoverContentView: View {
         switch metric.label {
         case "five_hour": return "clock"
         case "weekly_limit": return "calendar"
-        default: return "dollarsign.circle"  // 货币余额 (DeepSeek CNY/USD 等)
+        case "weekly_limit_boosted": return "calendar.badge.plus"  // 加成额度, 带 + 标识
+        case "mcp_monthly": return "wrench.and.screwdriver"  // MCP 月度调用次数
+        default: return "dollarsign.circle"  // 货币余额
         }
     }
 
@@ -156,6 +179,8 @@ struct PopoverContentView: View {
         switch metric.label {
         case "five_hour": return .orange
         case "weekly_limit": return .blue
+        case "weekly_limit_boosted": return .purple  // 加成额度, 紫色区分
+        case "mcp_monthly": return .purple  // MCP 月度
         default: return .green  // 货币余额
         }
     }
@@ -213,7 +238,7 @@ struct PopoverContentView: View {
                     Image(systemName: "checkmark")
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(viewModel.apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(!configSaveButtonEnabled)
             }
         }
         .padding()
@@ -221,17 +246,12 @@ struct PopoverContentView: View {
         .cornerRadius(8)
     }
 
-    private var regionPicker: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(I18nService.shared.translate("config.region"))
-                .font(.caption.bold())
-            Picker("", selection: $viewModel.regionInput) {
-                Text(I18nService.shared.translate("config.regionDomestic")).tag("domestic")
-                Text(I18nService.shared.translate("config.regionInternational")).tag("international")
-            }
-            .pickerStyle(.segmented)
-        }
+    // 保存按钮是否可用: 填了 API Key 即可
+    private var configSaveButtonEnabled: Bool {
+        guard viewModel.configPlatform != nil else { return false }
+        return !viewModel.apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
+
 
     // MARK: - Unconfigured Section
 
@@ -293,6 +313,23 @@ struct PopoverContentView: View {
         .cornerRadius(8)
     }
 
+    // 已配置但解析出的 metrics 为空 (API 结构变化/字段缺失): 灰色"无数据",
+    // 区别于"额度告急"的红色, 避免误导用户.
+    private var noDataSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Label(I18nService.shared.translate("popover.noData"), systemImage: "questionmark.circle")
+                .font(.subheadline.bold())
+                .foregroundColor(.secondary)
+            Text(I18nService.shared.translate("error.invalidResponse"))
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(8)
+    }
+
     // MARK: - Footer
 
     private var footerSection: some View {
@@ -341,5 +378,22 @@ struct PopoverContentView: View {
         } else {
             return String(format: I18nService.shared.translate("daily.reset.minutesonly"), minutes)
         }
+    }
+
+    /// 把大额 Credits 数字格式化成易读的本地化单位.
+    /// 中文: 万/亿; 英文: K/M. (CodeRabbit 指出原写死中文单位, 英文用户看不懂)
+    /// 例 (中文): 32_851_959_146 → "328.52亿", 932 → "932"
+    /// 例 (英文): 32_851_959_146 → "32852.00M"
+    private func formatCredits(_ value: Double) -> String {
+        let v = Int(value)
+        let isZh = I18nService.shared.currentLocale == "zh-Hans"
+        if isZh {
+            if v >= 100_000_000 { return String(format: "%.2f亿", Double(v) / 1e8) }
+            if v >= 10_000 { return String(format: "%.2f万", Double(v) / 1e4) }
+        } else {
+            if v >= 1_000_000 { return String(format: "%.2fM", Double(v) / 1e6) }
+            if v >= 1_000 { return String(format: "%.2fK", Double(v) / 1e3) }
+        }
+        return "\(v)"
     }
 }
