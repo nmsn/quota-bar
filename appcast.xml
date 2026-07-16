@@ -6,7 +6,7 @@
     <item>
       <title>Version 2.0.4</title>
       <pubDate>Thu, 16 Jul 2026 10:58:00 +0800</pubDate>
-      <enclosure url="https://github.com/nmsn/quota-bar/releases/download/v2.0.4/QuotaBar-2.0.4.dmg" sparkle:version="2.0.4" length="1407629" type="application/octet-stream"/>
+      <enclosure url="https://github.com/nmsn/quota-bar/releases/download/v2.0.4/QuotaBar-2.0.4.dmg" sparkle:version="5" sparkle:shortVersionString="2.0.4" length="1407629" type="application/octet-stream"/>
     </item>
     <item>
       <title>Version 2.0.3</title>
