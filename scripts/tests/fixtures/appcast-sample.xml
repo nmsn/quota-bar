@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>QuotaBar Updates</title>
+    <link>https://nmsn.github.io/quota-bar/appcast.xml</link>
+    <item>
+      <title>Version 2.0.3</title>
+      <pubDate>Wed, 03 Jun 2026 15:22:00 +0800</pubDate>
+      <enclosure url="https://github.com/nmsn/quota-bar/releases/download/v2.0.3/QuotaBar-2.0.3.dmg" sparkle:version="2.0.3" length="1776670" type="application/octet-stream"/>
+    </item>
+  </channel>
+</rss>
