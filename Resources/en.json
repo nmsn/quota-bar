@@ -16,6 +16,8 @@
     "update.openReleases": "Open Releases Page",
     "menu.quit": "Quit",
     "menu.refreshInterval": "Refresh Interval",
+    "menu.launchAtLogin": "Launch at Login",
+    "menu.launchAtLogin.failed": "Could not update login item. Keep QuotaBar in the Applications folder and check System Settings → General → Login Items.",
     "menu.refresh.30s": "30 Seconds",
     "menu.refresh.1m": "1 Minute",
     "menu.refresh.3m": "3 Minutes",
