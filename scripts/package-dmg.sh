@@ -2,7 +2,7 @@
 set -e
 
 PRODUCT_NAME="QuotaBar"
-MARKETING_VERSION="2.0.2"
+MARKETING_VERSION="2.0.4"
 SCHEME_NAME="quota-bar"
 PROJECT_FILE="quota-bar.xcodeproj"
 
