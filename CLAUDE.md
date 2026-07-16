@@ -114,15 +114,11 @@ gh pr merge <pr-number> --squash
 
 ## Sparkle Update Release Process
 
-1. Update `appcast.xml` on `gh-pages` branch with new version, date, and DMG URL
-2. Create and push GitHub Release with the `.dmg` file
-3. Ensure `length` attribute in appcast.xml matches actual DMG file size
+Use `scripts/update-appcast.sh`; `sparkle:version` must be `CURRENT_PROJECT_VERSION` (integer build), not marketing `X.Y.Z`. See `docs/sparkle-integration.md` and `docs/release-process.md`.
 
-```bash
-git checkout gh-pages
-# Edit appcast.xml item node
-git add appcast.xml && git commit -m "Release vX.X.X" && git push origin gh-pages
-```
+1. Update `appcast.xml` on `gh-pages` via the script (marketing + build + DMG length)
+2. Create and push GitHub Release with the `.dmg` file
+3. Ensure `length` matches DMG size; verify via raw gh-pages URL after human-approved push
 
 ## Tech Stack
 

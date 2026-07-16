@@ -110,7 +110,25 @@ xcodebuild -project minimax-bar.xcodeproj \
 gh release upload vX.Y.Z QuotaBar-X.Y.Z.dmg --clobber
 ```
 
-### 9. 验证 Release
+### 9. Update appcast (gh-pages)
+
+1. Confirm the Release `.app` / DMG embeds the intended MARKETING_VERSION and CURRENT_PROJECT_VERSION
+   (`defaults read /path/to/QuotaBar.app/Contents/Info CFBundleVersion`).
+2. Check out gh-pages worktree / clone path containing `appcast.xml`.
+3. Run:
+
+```bash
+./scripts/update-appcast.sh \
+  --marketing X.Y.Z \
+  --build N \
+  --dmg dist/QuotaBar-X.Y.Z.dmg \
+  --appcast /path/to/gh-pages/appcast.xml
+```
+
+4. Review diff; after human approval, commit and push `gh-pages`.
+5. Verify via raw URL that the new item shows integer `sparkle:version` and `shortVersionString`.
+
+### 10. 验证 Release
 
 ```bash
 gh release view vX.Y.Z --json assets --jq '.assets'
@@ -169,3 +187,7 @@ codesign --force --sign "Developer ID Application: YOUR_NAME" --deep QuotaBar-X.
 - [ ] DMG 已构建
 - [ ] DMG 已上传到 Release
 - [ ] Release 页面可下载 DMG
+- [ ] `sparkle:version` is integer build (not marketing)
+- [ ] `sparkle:shortVersionString` set
+- [ ] `length` matches DMG byte size
+- [ ] raw appcast verified
