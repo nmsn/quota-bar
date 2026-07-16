@@ -186,9 +186,9 @@ class StatusBarController {
         let rootMenu = NSMenu()
         rootMenu.addItem(displaySettingsItem)
         rootMenu.addItem(refreshItem)
-        rootMenu.addItem(launchAtLoginItem)
         rootMenu.addItem(platformItem)
         rootMenu.addItem(languageItem)
+        rootMenu.addItem(launchAtLoginItem)
         rootMenu.addItem(NSMenuItem.separator())
 
         let aboutItem = NSMenuItem(
