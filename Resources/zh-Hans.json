@@ -16,6 +16,8 @@
     "update.openReleases": "打开发布页面",
     "menu.quit": "退出",
     "menu.refreshInterval": "刷新间隔",
+    "menu.launchAtLogin": "开机时启动",
+    "menu.launchAtLogin.failed": "无法更新登录项。请将 QuotaBar 放在「应用程序」文件夹，并在 系统设置 → 通用 → 登录项 中检查权限。",
     "menu.refresh.30s": "30 秒",
     "menu.refresh.1m": "1 分钟",
     "menu.refresh.3m": "3 分钟",
