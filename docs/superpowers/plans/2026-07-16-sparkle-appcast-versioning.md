@@ -165,8 +165,6 @@ pass "replace missing"
 echo "All script tests passed."
 ```
 
-**Note for implementer:** Fix the broken `python3` placeholder block in the test file above when writing the real file — the crafted `cat > "$TMP/d.xml"` heredoc is the intended setup; delete the dead `python3` stub with `Path("$TMP/d.xml".replace...)`.
-
 - [ ] **Step 3: Run tests — expect FAIL (script missing)**
 
 ```bash
@@ -424,4 +422,4 @@ EOF
 | HITL for gh-pages push | Task 3 Step 3 |
 | Manual acceptance | Task 4 |
 
-No TBD placeholders remain after implementer removes the noted dead stub in the test template.
+No TBD placeholders remain.
