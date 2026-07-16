@@ -63,10 +63,14 @@ final class PlatformConfigStore {
     }
 
     func resetAPIKey() {
-        try? keychain.delete(account: platformType.rawValue)
-        apiKey = nil
-        save()
-        clearPlaintextAPIKeyInDefaults()
+        do {
+            try keychain.delete(account: platformType.rawValue)
+            apiKey = nil
+            save()
+            clearPlaintextAPIKeyInDefaults()
+        } catch {
+            // Leave in-memory key and defaults unchanged if Keychain delete fails
+        }
     }
 
     func setRegion(_ newRegion: String) {
@@ -78,15 +82,13 @@ final class PlatformConfigStore {
 
     private func load() {
         guard let anyValue = UserDefaults.standard.object(forKey: defaultsKey) else {
-            if let keychainKey = try? keychain.get(account: platformType.rawValue),
-               !keychainKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                apiKey = keychainKey
-            }
+            loadAPIKeyFromKeychainOnly()
             return
         }
         guard var dict = anyValue as? [String: Any] else {
-            // Data corruption: stored value is not a dictionary, reset it
+            // Data corruption: stored value is not a dictionary — remove and fall through to Keychain
             UserDefaults.standard.removeObject(forKey: defaultsKey)
+            loadAPIKeyFromKeychainOnly()
             return
         }
         // Strip NSNull values left by a previous bug and re-save the cleaned dict
@@ -128,6 +130,13 @@ final class PlatformConfigStore {
         }
 
         apiKey = nil
+    }
+
+    private func loadAPIKeyFromKeychainOnly() {
+        if let keychainKey = try? keychain.get(account: platformType.rawValue),
+           !keychainKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            apiKey = keychainKey
+        }
     }
 
     private func save() {

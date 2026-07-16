@@ -45,7 +45,35 @@ final class PlatformConfigStoreTests: XCTestCase {
         store.setAPIKey("sk-test123")
         store.resetAPIKey()
         XCTAssertFalse(store.isConfigured)
+        XCTAssertNil(store.apiKey)
         XCTAssertNil(try keychain.get(account: "deepseek"))
+        let dict = UserDefaults.standard.dictionary(forKey: deepseekKey)
+        XCTAssertEqual(dict?["api_key"] as? String, "")
+    }
+
+    func testResetAPIKeyLeavesStateWhenKeychainDeleteFails() throws {
+        struct Boom: Error {}
+        let store = makeStore(.deepseek)
+        store.setAPIKey("sk-keep-me")
+        keychain.deleteError = Boom()
+
+        store.resetAPIKey()
+
+        XCTAssertTrue(store.isConfigured)
+        XCTAssertEqual(store.apiKey, "sk-keep-me")
+        XCTAssertEqual(try keychain.get(account: "deepseek"), "sk-keep-me")
+    }
+
+    func testCorruptNonDictDefaultsStillLoadsKeyFromKeychain() throws {
+        try keychain.set("sk-from-keychain", account: "deepseek")
+        UserDefaults.standard.set("not-a-dictionary", forKey: deepseekKey)
+
+        let store = makeStore(.deepseek)
+
+        XCTAssertEqual(store.apiKey, "sk-from-keychain")
+        XCTAssertTrue(store.isConfigured)
+        // Corrupt string removed; template fill may recreate a proper dict
+        XCTAssertFalse(UserDefaults.standard.object(forKey: deepseekKey) is String)
     }
 
     func testPersistenceViaKeychain() {
