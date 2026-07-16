@@ -11,14 +11,16 @@ final class PlatformConfigStore {
     private(set) var region: String  // "domestic" or "international"
 
     private let defaultsKey: String
+    private let keychain: KeychainStoring
 
     var isConfigured: Bool {
         guard let key = apiKey else { return false }
         return !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    init(platformType: PlatformType) {
+    init(platformType: PlatformType, keychain: KeychainStoring = KeychainStore()) {
         self.platformType = platformType
+        self.keychain = keychain
         self.defaultsKey = "quotabar.platform.\(platformType.rawValue)"
 
         self.apiBaseURL = ""
@@ -44,13 +46,27 @@ final class PlatformConfigStore {
     }
 
     func setAPIKey(_ key: String) {
-        apiKey = key.trimmingCharacters(in: .whitespacesAndNewlines)
-        save()
+        let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            resetAPIKey()
+            return
+        }
+        do {
+            try keychain.set(trimmed, account: platformType.rawValue)
+            apiKey = trimmed
+            // Persist non-secret fields with empty api_key
+            save()
+            clearPlaintextAPIKeyInDefaults()
+        } catch {
+            // Do not claim success; leave previous apiKey unchanged
+        }
     }
 
     func resetAPIKey() {
+        try? keychain.delete(account: platformType.rawValue)
         apiKey = nil
         save()
+        clearPlaintextAPIKeyInDefaults()
     }
 
     func setRegion(_ newRegion: String) {
@@ -61,7 +77,13 @@ final class PlatformConfigStore {
     // MARK: - Private
 
     private func load() {
-        guard let anyValue = UserDefaults.standard.object(forKey: defaultsKey) else { return }
+        guard let anyValue = UserDefaults.standard.object(forKey: defaultsKey) else {
+            if let keychainKey = try? keychain.get(account: platformType.rawValue),
+               !keychainKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                apiKey = keychainKey
+            }
+            return
+        }
         guard var dict = anyValue as? [String: Any] else {
             // Data corruption: stored value is not a dictionary, reset it
             UserDefaults.standard.removeObject(forKey: defaultsKey)
@@ -77,8 +99,35 @@ final class PlatformConfigStore {
         apiBaseURLInternational = dict["api_base_url_international"] as? String
         authHeader = dict["auth_header"] as? String ?? "Authorization"
         authPrefix = dict["auth_prefix"] as? String ?? "Bearer "
-        apiKey = dict["api_key"] as? String
         region = dict["region"] as? String ?? "domestic"
+
+        // Do NOT assign apiKey from dict as the final source.
+        let plaintext = (dict["api_key"] as? String)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let plaintextOrNil = (plaintext?.isEmpty == false) ? plaintext : nil
+
+        if let keychainKey = try? keychain.get(account: platformType.rawValue),
+           !keychainKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            apiKey = keychainKey
+            if plaintextOrNil != nil {
+                clearPlaintextAPIKeyInDefaults()
+            }
+            return
+        }
+
+        if let plaintextOrNil {
+            do {
+                try keychain.set(plaintextOrNil, account: platformType.rawValue)
+                apiKey = plaintextOrNil
+                clearPlaintextAPIKeyInDefaults()
+            } catch {
+                // Keep plaintext in defaults; still expose for this session
+                apiKey = plaintextOrNil
+            }
+            return
+        }
+
+        apiKey = nil
     }
 
     private func save() {
@@ -91,7 +140,13 @@ final class PlatformConfigStore {
         if let intlURL = apiBaseURLInternational {
             dict["api_base_url_international"] = intlURL
         }
-        dict["api_key"] = apiKey ?? ""
+        dict["api_key"] = ""
+        UserDefaults.standard.set(dict, forKey: defaultsKey)
+    }
+
+    private func clearPlaintextAPIKeyInDefaults() {
+        guard var dict = UserDefaults.standard.dictionary(forKey: defaultsKey) else { return }
+        dict["api_key"] = ""
         UserDefaults.standard.set(dict, forKey: defaultsKey)
     }
 
